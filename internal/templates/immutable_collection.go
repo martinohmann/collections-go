@@ -9,14 +9,18 @@ import (
 	"sort"
 )
 
+// {{.Name}} is an immutable collection of {{.ItemType}} values.
 type {{.Name}} struct {
 	items []{{.ItemType}}
 }
 
+// New{{.Name}} creates a new immutable collection from a slice of {{.ItemType}}.
 func New{{.Name}}(items []{{.ItemType}}) *{{.Name}} {
 	return &{{.Name}}{items}
 }
 
+// Items returns the underlying slice of {{.ItemType}} values used by the
+// collection.
 func (c *{{.Name}}) Items() []{{.ItemType}} {
 	return c.items
 }

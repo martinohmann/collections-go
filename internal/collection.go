@@ -6,14 +6,18 @@ import (
 	"sort"
 )
 
+// Collection is a collection of *Type values.
 type Collection struct {
 	items []*Type
 }
 
+// NewCollection creates a new collection from a slice of *Type.
 func NewCollection(items []*Type) *Collection {
 	return &Collection{items}
 }
 
+// Items returns the underlying slice of *Type values used by the
+// collection.
 func (c *Collection) Items() []*Type {
 	return c.items
 }

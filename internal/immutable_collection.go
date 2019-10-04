@@ -6,14 +6,18 @@ import (
 	"sort"
 )
 
+// ImmutableCollection is an immutable collection of *Type values.
 type ImmutableCollection struct {
 	items []*Type
 }
 
+// NewImmutableCollection creates a new immutable collection from a slice of *Type.
 func NewImmutableCollection(items []*Type) *ImmutableCollection {
 	return &ImmutableCollection{items}
 }
 
+// Items returns the underlying slice of *Type values used by the
+// collection.
 func (c *ImmutableCollection) Items() []*Type {
 	return c.items
 }

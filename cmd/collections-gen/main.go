@@ -68,12 +68,7 @@ func (c *Config) validate() error {
 func (c *Config) generateName() string {
 	itemType := alphanumericRegexp.ReplaceAllString(c.ItemType, "")
 
-	name := fmt.Sprintf("%sCollection", strings.Title(itemType))
-	if c.Immutable {
-		name = fmt.Sprintf("Immutable%s", name)
-	}
-
-	return name
+	return fmt.Sprintf("%sCollection", strings.Title(itemType))
 }
 
 func (c *Config) complete(args []string) error {
@@ -87,7 +82,7 @@ func (c *Config) complete(args []string) error {
 		return nil
 	}
 
-	if c.ItemType[0] == '*' {
+	if c.ItemType[0] == '*' || strings.HasPrefix(c.ItemType, "[]") {
 		c.ZeroValue = "nil"
 		return nil
 	}
