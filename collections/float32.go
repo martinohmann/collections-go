@@ -22,18 +22,23 @@ func (c *Float32Collection) Items() []float32 {
 	return c.items
 }
 
+// EachIndex calls fn for every item in the collection. The slice index of the
+// item is passed to fn as the second argument.
 func (c *Float32Collection) EachIndex(fn func(float32, int)) {
 	for i, item := range c.items {
 		fn(item, i)
 	}
 }
 
+// Each calls fn for every item in the collection.
 func (c *Float32Collection) Each(fn func(float32)) {
 	c.EachIndex(func(item float32, _ int) {
 		fn(item)
 	})
 }
 
+// IndexOf searches for el in the collection and returns the first index where
+// el is found. If el is not present in the collection IndexOf will return -1.
 func (c *Float32Collection) IndexOf(el float32) int {
 	for i, item := range c.items {
 		if item == el {
@@ -44,10 +49,14 @@ func (c *Float32Collection) IndexOf(el float32) int {
 	return -1
 }
 
+// First returns the first item from the collection. Will panic if the
+// underlying slice is empty.
 func (c *Float32Collection) First() float32 {
 	return c.Nth(0)
 }
 
+// FirstN returns a new collection containing the first n items. Will return
+// less than n items if the underlying slice's length is < n.
 func (c *Float32Collection) FirstN(n int) *Float32Collection {
 	if n > c.Len() {
 		n = c.Len()
@@ -56,10 +65,14 @@ func (c *Float32Collection) FirstN(n int) *Float32Collection {
 	return c.Slice(0, n)
 }
 
+// Last returns the last item from the collection. Will panic if the underlying
+// slice is empty.
 func (c *Float32Collection) Last() float32 {
 	return c.Nth(c.Len() - 1)
 }
 
+// LastN returns a new collection containing the last n items. Will return less
+// than n items if the underlying slice's length is < n.
 func (c *Float32Collection) LastN(n int) *Float32Collection {
 	if c.Len()-n < 0 {
 		n = c.Len()
@@ -68,34 +81,41 @@ func (c *Float32Collection) LastN(n int) *Float32Collection {
 	return c.Slice(c.Len()-n, c.Len())
 }
 
+// Get returns the item at idx from the collection. Will panic if the
+// underlying slice is shorter than idx+1.
 func (c *Float32Collection) Get(idx int) float32 {
 	return c.Nth(idx)
 }
 
+// Nth returns the nth item from the collection. Will panic if the underlying
+// slice is shorter than idx+1.
 func (c *Float32Collection) Nth(idx int) float32 {
 	return c.items[idx]
 }
 
+// Len returns the length of the underlying float32 slice.
 func (c *Float32Collection) Len() int {
 	return len(c.items)
 }
 
+// Cap returns the capacity of the underlying float32 slice.
 func (c *Float32Collection) Cap() int {
 	return cap(c.items)
 }
 
+// Append appends items and returns the collection.
 func (c *Float32Collection) Append(items ...float32) *Float32Collection {
 	c.items = append(c.items, items...)
-
 	return c
 }
 
+// Prepend prepends items and returns the collection.
 func (c *Float32Collection) Prepend(items ...float32) *Float32Collection {
 	c.items = append(items, c.items...)
-
 	return c
 }
 
+// Copy creates a copy of the collection and the underlying float32 slice.
 func (c *Float32Collection) Copy() *Float32Collection {
 	s := make([]float32, c.Len(), c.Len())
 	copy(s, c.items)
@@ -103,6 +123,8 @@ func (c *Float32Collection) Copy() *Float32Collection {
 	return NewFloat32Collection(s)
 }
 
+// Filter removes all items from the collection for which fn evaluates to
+// false and returns c.
 func (c *Float32Collection) Filter(fn func(float32) bool) *Float32Collection {
 	s := c.items[:0]
 
@@ -121,16 +143,23 @@ func (c *Float32Collection) Filter(fn func(float32) bool) *Float32Collection {
 	return c
 }
 
+// Collect removes all items from the collection for which fn evaluates to
+// false and returns c.
 func (c *Float32Collection) Collect(fn func(float32) bool) *Float32Collection {
 	return c.Filter(fn)
 }
 
+// Reject removes all items from the collection for which fn evaluates to
+// true and returns c.
 func (c *Float32Collection) Reject(fn func(float32) bool) *Float32Collection {
 	return c.Filter(func(v float32) bool {
 		return !fn(v)
 	})
 }
 
+// Partition partitions the collection into two new collections. The first
+// collection contains all items where fn evaluates to true, the second one all
+// items where fn evaluates to false.
 func (c *Float32Collection) Partition(fn func(float32) bool) (*Float32Collection, *Float32Collection) {
 	lhs := make([]float32, 0, c.Len())
 	rhs := make([]float32, 0, c.Len())
@@ -146,6 +175,8 @@ func (c *Float32Collection) Partition(fn func(float32) bool) (*Float32Collection
 	return NewFloat32Collection(lhs), NewFloat32Collection(rhs)
 }
 
+// Map calls fn for each item in the collection an replaces its value with the
+// result of fn.
 func (c *Float32Collection) Map(fn func(float32) float32) *Float32Collection {
 	for i, item := range c.items {
 		c.items[i] = fn(item)
@@ -181,6 +212,7 @@ func (c *Float32Collection) FindOk(fn func(float32) bool) (float32, bool) {
 	return 0.0, false
 }
 
+// Any returns true as soon as fn evaluates to true for one item in c.
 func (c *Float32Collection) Any(fn func(float32) bool) bool {
 	for _, item := range c.items {
 		if fn(item) {
@@ -191,6 +223,7 @@ func (c *Float32Collection) Any(fn func(float32) bool) bool {
 	return false
 }
 
+// All returns true if fn evaluates to true for all items in c.
 func (c *Float32Collection) All(fn func(float32) bool) bool {
 	for _, item := range c.items {
 		if !fn(item) {
@@ -201,6 +234,7 @@ func (c *Float32Collection) All(fn func(float32) bool) bool {
 	return true
 }
 
+// Contains returns true if the collection contains el.
 func (c *Float32Collection) Contains(el float32) bool {
 	for _, item := range c.items {
 		if item == el {
@@ -213,7 +247,6 @@ func (c *Float32Collection) Contains(el float32) bool {
 
 func (c *Float32Collection) Sort(fn func(float32, float32) bool) *Float32Collection {
 	sort.Slice(c.items, c.lessFunc(fn))
-
 	return c
 }
 
@@ -237,7 +270,6 @@ func (c *Float32Collection) Reverse() *Float32Collection {
 
 func (c *Float32Collection) Remove(idx int) *Float32Collection {
 	c.items = append(c.items[:idx], c.items[idx+1:]...)
-
 	return c
 }
 
@@ -255,18 +287,15 @@ func (c *Float32Collection) InsertItem(item float32, idx int) *Float32Collection
 	c.items = append(c.items, 0.0)
 	copy(c.items[idx+1:], c.items[idx:])
 	c.items[idx] = item
-
 	return c
 }
 
 func (c *Float32Collection) Cut(i, j int) *Float32Collection {
 	c.items = append(c.items[:i], c.items[j:]...)
-
 	return c
 }
 
 func (c *Float32Collection) Slice(i, j int) *Float32Collection {
 	c.items = c.items[i:j]
-
 	return c
 }

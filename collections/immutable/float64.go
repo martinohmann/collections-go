@@ -22,18 +22,23 @@ func (c *Float64Collection) Items() []float64 {
 	return c.items
 }
 
+// EachIndex calls fn for every item in the collection. The slice index of the
+// item is passed to fn as the second argument.
 func (c *Float64Collection) EachIndex(fn func(float64, int)) {
 	for i, item := range c.items {
 		fn(item, i)
 	}
 }
 
+// Each calls fn for every item in the collection.
 func (c *Float64Collection) Each(fn func(float64)) {
 	c.EachIndex(func(item float64, _ int) {
 		fn(item)
 	})
 }
 
+// IndexOf searches for el in the collection and returns the first index where
+// el is found. If el is not present in the collection IndexOf will return -1.
 func (c *Float64Collection) IndexOf(el float64) int {
 	for i, item := range c.items {
 		if item == el {
@@ -44,10 +49,14 @@ func (c *Float64Collection) IndexOf(el float64) int {
 	return -1
 }
 
+// First returns the first item from the collection. Will panic if the
+// underlying slice is empty.
 func (c *Float64Collection) First() float64 {
 	return c.Nth(0)
 }
 
+// FirstN returns a new collection containing the first n items. Will return
+// less than n items if the underlying slice's length is < n.
 func (c *Float64Collection) FirstN(n int) *Float64Collection {
 	if n > c.Len() {
 		n = c.Len()
@@ -56,10 +65,14 @@ func (c *Float64Collection) FirstN(n int) *Float64Collection {
 	return c.Slice(0, n)
 }
 
+// Last returns the last item from the collection. Will panic if the underlying
+// slice is empty.
 func (c *Float64Collection) Last() float64 {
 	return c.Nth(c.Len() - 1)
 }
 
+// LastN returns a new collection containing the last n items. Will return less
+// than n items if the underlying slice's length is < n.
 func (c *Float64Collection) LastN(n int) *Float64Collection {
 	if c.Len()-n < 0 {
 		n = c.Len()
@@ -68,36 +81,45 @@ func (c *Float64Collection) LastN(n int) *Float64Collection {
 	return c.Slice(c.Len()-n, c.Len())
 }
 
+// Get returns the item at idx from the collection. Will panic if the
+// underlying slice is shorter than idx+1.
 func (c *Float64Collection) Get(idx int) float64 {
 	return c.Nth(idx)
 }
 
+// Nth returns the nth item from the collection. Will panic if the underlying
+// slice is shorter than idx+1.
 func (c *Float64Collection) Nth(idx int) float64 {
 	return c.items[idx]
 }
 
+// Len returns the length of the underlying float64 slice.
 func (c *Float64Collection) Len() int {
 	return len(c.items)
 }
 
+// Cap returns the capacity of the underlying float64 slice.
 func (c *Float64Collection) Cap() int {
 	return cap(c.items)
 }
 
+// Append appends items and returns the collection. The
+// initial collection will not be modified.
 func (c *Float64Collection) Append(items ...float64) *Float64Collection {
 	d := c.Copy()
 	d.items = append(d.items, items...)
-
 	return d
 }
 
+// Prepend prepends items and returns the collection. The
+// initial collection will not be modified.
 func (c *Float64Collection) Prepend(items ...float64) *Float64Collection {
 	d := c.Copy()
 	d.items = append(items, d.items...)
-
 	return d
 }
 
+// Copy creates a copy of the collection and the underlying float64 slice.
 func (c *Float64Collection) Copy() *Float64Collection {
 	s := make([]float64, c.Len(), c.Len())
 	copy(s, c.items)
@@ -105,6 +127,8 @@ func (c *Float64Collection) Copy() *Float64Collection {
 	return NewFloat64Collection(s)
 }
 
+// Filter collects all items for which fn evaluates to true into a new
+// collection. The inital collection is not altered.
 func (c *Float64Collection) Filter(fn func(float64) bool) *Float64Collection {
 	d := c.Copy()
 	s := d.items[:0]
@@ -124,16 +148,23 @@ func (c *Float64Collection) Filter(fn func(float64) bool) *Float64Collection {
 	return d
 }
 
+// Collect collects all items for which fn evaluates to true into a new
+// collection. The inital collection is not altered.
 func (c *Float64Collection) Collect(fn func(float64) bool) *Float64Collection {
 	return c.Filter(fn)
 }
 
+// Reject collects all items for which fn evaluates to false into a new
+// collection. The inital collection is not altered.
 func (c *Float64Collection) Reject(fn func(float64) bool) *Float64Collection {
 	return c.Filter(func(v float64) bool {
 		return !fn(v)
 	})
 }
 
+// Partition partitions the collection into two new collections. The first
+// collection contains all items where fn evaluates to true, the second one all
+// items where fn evaluates to false.
 func (c *Float64Collection) Partition(fn func(float64) bool) (*Float64Collection, *Float64Collection) {
 	lhs := make([]float64, 0, c.Len())
 	rhs := make([]float64, 0, c.Len())
@@ -149,6 +180,9 @@ func (c *Float64Collection) Partition(fn func(float64) bool) (*Float64Collection
 	return NewFloat64Collection(lhs), NewFloat64Collection(rhs)
 }
 
+// Map calls fn for each item in the collection an replaces its value with the
+// result of fn. The result is a new collection. The initial
+// collection is not modified.
 func (c *Float64Collection) Map(fn func(float64) float64) *Float64Collection {
 	d := c.Copy()
 
@@ -186,6 +220,7 @@ func (c *Float64Collection) FindOk(fn func(float64) bool) (float64, bool) {
 	return 0.0, false
 }
 
+// Any returns true as soon as fn evaluates to true for one item in c.
 func (c *Float64Collection) Any(fn func(float64) bool) bool {
 	for _, item := range c.items {
 		if fn(item) {
@@ -196,6 +231,7 @@ func (c *Float64Collection) Any(fn func(float64) bool) bool {
 	return false
 }
 
+// All returns true if fn evaluates to true for all items in c.
 func (c *Float64Collection) All(fn func(float64) bool) bool {
 	for _, item := range c.items {
 		if !fn(item) {
@@ -206,6 +242,7 @@ func (c *Float64Collection) All(fn func(float64) bool) bool {
 	return true
 }
 
+// Contains returns true if the collection contains el.
 func (c *Float64Collection) Contains(el float64) bool {
 	for _, item := range c.items {
 		if item == el {
@@ -219,7 +256,6 @@ func (c *Float64Collection) Contains(el float64) bool {
 func (c *Float64Collection) Sort(fn func(float64, float64) bool) *Float64Collection {
 	d := c.Copy()
 	sort.Slice(d.items, d.lessFunc(fn))
-
 	return d
 }
 
@@ -245,7 +281,6 @@ func (c *Float64Collection) Reverse() *Float64Collection {
 func (c *Float64Collection) Remove(idx int) *Float64Collection {
 	d := c.Copy()
 	d.items = append(d.items[:idx], d.items[idx+1:]...)
-
 	return d
 }
 
@@ -266,20 +301,17 @@ func (c *Float64Collection) InsertItem(item float64, idx int) *Float64Collection
 	d.items = append(d.items, 0.0)
 	copy(d.items[idx+1:], d.items[idx:])
 	d.items[idx] = item
-
 	return d
 }
 
 func (c *Float64Collection) Cut(i, j int) *Float64Collection {
 	d := c.Copy()
 	d.items = append(d.items[:i], d.items[j:]...)
-
 	return d
 }
 
 func (c *Float64Collection) Slice(i, j int) *Float64Collection {
 	d := c.Copy()
 	d.items = d.items[i:j]
-
 	return d
 }

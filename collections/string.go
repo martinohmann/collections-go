@@ -22,18 +22,23 @@ func (c *StringCollection) Items() []string {
 	return c.items
 }
 
+// EachIndex calls fn for every item in the collection. The slice index of the
+// item is passed to fn as the second argument.
 func (c *StringCollection) EachIndex(fn func(string, int)) {
 	for i, item := range c.items {
 		fn(item, i)
 	}
 }
 
+// Each calls fn for every item in the collection.
 func (c *StringCollection) Each(fn func(string)) {
 	c.EachIndex(func(item string, _ int) {
 		fn(item)
 	})
 }
 
+// IndexOf searches for el in the collection and returns the first index where
+// el is found. If el is not present in the collection IndexOf will return -1.
 func (c *StringCollection) IndexOf(el string) int {
 	for i, item := range c.items {
 		if item == el {
@@ -44,10 +49,14 @@ func (c *StringCollection) IndexOf(el string) int {
 	return -1
 }
 
+// First returns the first item from the collection. Will panic if the
+// underlying slice is empty.
 func (c *StringCollection) First() string {
 	return c.Nth(0)
 }
 
+// FirstN returns a new collection containing the first n items. Will return
+// less than n items if the underlying slice's length is < n.
 func (c *StringCollection) FirstN(n int) *StringCollection {
 	if n > c.Len() {
 		n = c.Len()
@@ -56,10 +65,14 @@ func (c *StringCollection) FirstN(n int) *StringCollection {
 	return c.Slice(0, n)
 }
 
+// Last returns the last item from the collection. Will panic if the underlying
+// slice is empty.
 func (c *StringCollection) Last() string {
 	return c.Nth(c.Len() - 1)
 }
 
+// LastN returns a new collection containing the last n items. Will return less
+// than n items if the underlying slice's length is < n.
 func (c *StringCollection) LastN(n int) *StringCollection {
 	if c.Len()-n < 0 {
 		n = c.Len()
@@ -68,34 +81,41 @@ func (c *StringCollection) LastN(n int) *StringCollection {
 	return c.Slice(c.Len()-n, c.Len())
 }
 
+// Get returns the item at idx from the collection. Will panic if the
+// underlying slice is shorter than idx+1.
 func (c *StringCollection) Get(idx int) string {
 	return c.Nth(idx)
 }
 
+// Nth returns the nth item from the collection. Will panic if the underlying
+// slice is shorter than idx+1.
 func (c *StringCollection) Nth(idx int) string {
 	return c.items[idx]
 }
 
+// Len returns the length of the underlying string slice.
 func (c *StringCollection) Len() int {
 	return len(c.items)
 }
 
+// Cap returns the capacity of the underlying string slice.
 func (c *StringCollection) Cap() int {
 	return cap(c.items)
 }
 
+// Append appends items and returns the collection.
 func (c *StringCollection) Append(items ...string) *StringCollection {
 	c.items = append(c.items, items...)
-
 	return c
 }
 
+// Prepend prepends items and returns the collection.
 func (c *StringCollection) Prepend(items ...string) *StringCollection {
 	c.items = append(items, c.items...)
-
 	return c
 }
 
+// Copy creates a copy of the collection and the underlying string slice.
 func (c *StringCollection) Copy() *StringCollection {
 	s := make([]string, c.Len(), c.Len())
 	copy(s, c.items)
@@ -103,6 +123,8 @@ func (c *StringCollection) Copy() *StringCollection {
 	return NewStringCollection(s)
 }
 
+// Filter removes all items from the collection for which fn evaluates to
+// false and returns c.
 func (c *StringCollection) Filter(fn func(string) bool) *StringCollection {
 	s := c.items[:0]
 
@@ -121,16 +143,23 @@ func (c *StringCollection) Filter(fn func(string) bool) *StringCollection {
 	return c
 }
 
+// Collect removes all items from the collection for which fn evaluates to
+// false and returns c.
 func (c *StringCollection) Collect(fn func(string) bool) *StringCollection {
 	return c.Filter(fn)
 }
 
+// Reject removes all items from the collection for which fn evaluates to
+// true and returns c.
 func (c *StringCollection) Reject(fn func(string) bool) *StringCollection {
 	return c.Filter(func(v string) bool {
 		return !fn(v)
 	})
 }
 
+// Partition partitions the collection into two new collections. The first
+// collection contains all items where fn evaluates to true, the second one all
+// items where fn evaluates to false.
 func (c *StringCollection) Partition(fn func(string) bool) (*StringCollection, *StringCollection) {
 	lhs := make([]string, 0, c.Len())
 	rhs := make([]string, 0, c.Len())
@@ -146,6 +175,8 @@ func (c *StringCollection) Partition(fn func(string) bool) (*StringCollection, *
 	return NewStringCollection(lhs), NewStringCollection(rhs)
 }
 
+// Map calls fn for each item in the collection an replaces its value with the
+// result of fn.
 func (c *StringCollection) Map(fn func(string) string) *StringCollection {
 	for i, item := range c.items {
 		c.items[i] = fn(item)
@@ -181,6 +212,7 @@ func (c *StringCollection) FindOk(fn func(string) bool) (string, bool) {
 	return "", false
 }
 
+// Any returns true as soon as fn evaluates to true for one item in c.
 func (c *StringCollection) Any(fn func(string) bool) bool {
 	for _, item := range c.items {
 		if fn(item) {
@@ -191,6 +223,7 @@ func (c *StringCollection) Any(fn func(string) bool) bool {
 	return false
 }
 
+// All returns true if fn evaluates to true for all items in c.
 func (c *StringCollection) All(fn func(string) bool) bool {
 	for _, item := range c.items {
 		if !fn(item) {
@@ -201,6 +234,7 @@ func (c *StringCollection) All(fn func(string) bool) bool {
 	return true
 }
 
+// Contains returns true if the collection contains el.
 func (c *StringCollection) Contains(el string) bool {
 	for _, item := range c.items {
 		if item == el {
@@ -213,7 +247,6 @@ func (c *StringCollection) Contains(el string) bool {
 
 func (c *StringCollection) Sort(fn func(string, string) bool) *StringCollection {
 	sort.Slice(c.items, c.lessFunc(fn))
-
 	return c
 }
 
@@ -237,7 +270,6 @@ func (c *StringCollection) Reverse() *StringCollection {
 
 func (c *StringCollection) Remove(idx int) *StringCollection {
 	c.items = append(c.items[:idx], c.items[idx+1:]...)
-
 	return c
 }
 
@@ -255,18 +287,15 @@ func (c *StringCollection) InsertItem(item string, idx int) *StringCollection {
 	c.items = append(c.items, "")
 	copy(c.items[idx+1:], c.items[idx:])
 	c.items[idx] = item
-
 	return c
 }
 
 func (c *StringCollection) Cut(i, j int) *StringCollection {
 	c.items = append(c.items[:i], c.items[j:]...)
-
 	return c
 }
 
 func (c *StringCollection) Slice(i, j int) *StringCollection {
 	c.items = c.items[i:j]
-
 	return c
 }

@@ -22,18 +22,23 @@ func (c *BoolCollection) Items() []bool {
 	return c.items
 }
 
+// EachIndex calls fn for every item in the collection. The slice index of the
+// item is passed to fn as the second argument.
 func (c *BoolCollection) EachIndex(fn func(bool, int)) {
 	for i, item := range c.items {
 		fn(item, i)
 	}
 }
 
+// Each calls fn for every item in the collection.
 func (c *BoolCollection) Each(fn func(bool)) {
 	c.EachIndex(func(item bool, _ int) {
 		fn(item)
 	})
 }
 
+// IndexOf searches for el in the collection and returns the first index where
+// el is found. If el is not present in the collection IndexOf will return -1.
 func (c *BoolCollection) IndexOf(el bool) int {
 	for i, item := range c.items {
 		if item == el {
@@ -44,10 +49,14 @@ func (c *BoolCollection) IndexOf(el bool) int {
 	return -1
 }
 
+// First returns the first item from the collection. Will panic if the
+// underlying slice is empty.
 func (c *BoolCollection) First() bool {
 	return c.Nth(0)
 }
 
+// FirstN returns a new collection containing the first n items. Will return
+// less than n items if the underlying slice's length is < n.
 func (c *BoolCollection) FirstN(n int) *BoolCollection {
 	if n > c.Len() {
 		n = c.Len()
@@ -56,10 +65,14 @@ func (c *BoolCollection) FirstN(n int) *BoolCollection {
 	return c.Slice(0, n)
 }
 
+// Last returns the last item from the collection. Will panic if the underlying
+// slice is empty.
 func (c *BoolCollection) Last() bool {
 	return c.Nth(c.Len() - 1)
 }
 
+// LastN returns a new collection containing the last n items. Will return less
+// than n items if the underlying slice's length is < n.
 func (c *BoolCollection) LastN(n int) *BoolCollection {
 	if c.Len()-n < 0 {
 		n = c.Len()
@@ -68,34 +81,41 @@ func (c *BoolCollection) LastN(n int) *BoolCollection {
 	return c.Slice(c.Len()-n, c.Len())
 }
 
+// Get returns the item at idx from the collection. Will panic if the
+// underlying slice is shorter than idx+1.
 func (c *BoolCollection) Get(idx int) bool {
 	return c.Nth(idx)
 }
 
+// Nth returns the nth item from the collection. Will panic if the underlying
+// slice is shorter than idx+1.
 func (c *BoolCollection) Nth(idx int) bool {
 	return c.items[idx]
 }
 
+// Len returns the length of the underlying bool slice.
 func (c *BoolCollection) Len() int {
 	return len(c.items)
 }
 
+// Cap returns the capacity of the underlying bool slice.
 func (c *BoolCollection) Cap() int {
 	return cap(c.items)
 }
 
+// Append appends items and returns the collection.
 func (c *BoolCollection) Append(items ...bool) *BoolCollection {
 	c.items = append(c.items, items...)
-
 	return c
 }
 
+// Prepend prepends items and returns the collection.
 func (c *BoolCollection) Prepend(items ...bool) *BoolCollection {
 	c.items = append(items, c.items...)
-
 	return c
 }
 
+// Copy creates a copy of the collection and the underlying bool slice.
 func (c *BoolCollection) Copy() *BoolCollection {
 	s := make([]bool, c.Len(), c.Len())
 	copy(s, c.items)
@@ -103,6 +123,8 @@ func (c *BoolCollection) Copy() *BoolCollection {
 	return NewBoolCollection(s)
 }
 
+// Filter removes all items from the collection for which fn evaluates to
+// false and returns c.
 func (c *BoolCollection) Filter(fn func(bool) bool) *BoolCollection {
 	s := c.items[:0]
 
@@ -121,16 +143,23 @@ func (c *BoolCollection) Filter(fn func(bool) bool) *BoolCollection {
 	return c
 }
 
+// Collect removes all items from the collection for which fn evaluates to
+// false and returns c.
 func (c *BoolCollection) Collect(fn func(bool) bool) *BoolCollection {
 	return c.Filter(fn)
 }
 
+// Reject removes all items from the collection for which fn evaluates to
+// true and returns c.
 func (c *BoolCollection) Reject(fn func(bool) bool) *BoolCollection {
 	return c.Filter(func(v bool) bool {
 		return !fn(v)
 	})
 }
 
+// Partition partitions the collection into two new collections. The first
+// collection contains all items where fn evaluates to true, the second one all
+// items where fn evaluates to false.
 func (c *BoolCollection) Partition(fn func(bool) bool) (*BoolCollection, *BoolCollection) {
 	lhs := make([]bool, 0, c.Len())
 	rhs := make([]bool, 0, c.Len())
@@ -146,6 +175,8 @@ func (c *BoolCollection) Partition(fn func(bool) bool) (*BoolCollection, *BoolCo
 	return NewBoolCollection(lhs), NewBoolCollection(rhs)
 }
 
+// Map calls fn for each item in the collection an replaces its value with the
+// result of fn.
 func (c *BoolCollection) Map(fn func(bool) bool) *BoolCollection {
 	for i, item := range c.items {
 		c.items[i] = fn(item)
@@ -181,6 +212,7 @@ func (c *BoolCollection) FindOk(fn func(bool) bool) (bool, bool) {
 	return false, false
 }
 
+// Any returns true as soon as fn evaluates to true for one item in c.
 func (c *BoolCollection) Any(fn func(bool) bool) bool {
 	for _, item := range c.items {
 		if fn(item) {
@@ -191,6 +223,7 @@ func (c *BoolCollection) Any(fn func(bool) bool) bool {
 	return false
 }
 
+// All returns true if fn evaluates to true for all items in c.
 func (c *BoolCollection) All(fn func(bool) bool) bool {
 	for _, item := range c.items {
 		if !fn(item) {
@@ -201,6 +234,7 @@ func (c *BoolCollection) All(fn func(bool) bool) bool {
 	return true
 }
 
+// Contains returns true if the collection contains el.
 func (c *BoolCollection) Contains(el bool) bool {
 	for _, item := range c.items {
 		if item == el {
@@ -213,7 +247,6 @@ func (c *BoolCollection) Contains(el bool) bool {
 
 func (c *BoolCollection) Sort(fn func(bool, bool) bool) *BoolCollection {
 	sort.Slice(c.items, c.lessFunc(fn))
-
 	return c
 }
 
@@ -237,7 +270,6 @@ func (c *BoolCollection) Reverse() *BoolCollection {
 
 func (c *BoolCollection) Remove(idx int) *BoolCollection {
 	c.items = append(c.items[:idx], c.items[idx+1:]...)
-
 	return c
 }
 
@@ -255,18 +287,15 @@ func (c *BoolCollection) InsertItem(item bool, idx int) *BoolCollection {
 	c.items = append(c.items, false)
 	copy(c.items[idx+1:], c.items[idx:])
 	c.items[idx] = item
-
 	return c
 }
 
 func (c *BoolCollection) Cut(i, j int) *BoolCollection {
 	c.items = append(c.items[:i], c.items[j:]...)
-
 	return c
 }
 
 func (c *BoolCollection) Slice(i, j int) *BoolCollection {
 	c.items = c.items[i:j]
-
 	return c
 }

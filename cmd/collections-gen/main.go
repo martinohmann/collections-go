@@ -45,14 +45,6 @@ type Config struct {
 	Immutable  bool
 }
 
-func (c *Config) getTemplateText() string {
-	if c.Immutable {
-		return templates.ImmutableCollection
-	}
-
-	return templates.Collection
-}
-
 func (c *Config) validate() error {
 	if len(c.Package) == 0 {
 		return errors.New("package must not be empty")
@@ -136,7 +128,7 @@ func main() {
 
 	config.OutputFile = args[0]
 
-	tpl, err := parseTemplate(config.getTemplateText())
+	tpl, err := parseTemplate(templates.Collection)
 	if err != nil {
 		panic(err)
 	}

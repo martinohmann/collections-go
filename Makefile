@@ -23,7 +23,7 @@ vet: ## run go vet
 	go vet $$(go list ./... | grep -v /vendor/)
 
 .PHONY: generate
-generate: ## run go generate
+generate: install ## run go generate
 	go generate $$(go list ./... | grep -v /vendor/)
 
 .PHONY: coverage

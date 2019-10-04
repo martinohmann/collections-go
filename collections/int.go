@@ -22,18 +22,23 @@ func (c *IntCollection) Items() []int {
 	return c.items
 }
 
+// EachIndex calls fn for every item in the collection. The slice index of the
+// item is passed to fn as the second argument.
 func (c *IntCollection) EachIndex(fn func(int, int)) {
 	for i, item := range c.items {
 		fn(item, i)
 	}
 }
 
+// Each calls fn for every item in the collection.
 func (c *IntCollection) Each(fn func(int)) {
 	c.EachIndex(func(item int, _ int) {
 		fn(item)
 	})
 }
 
+// IndexOf searches for el in the collection and returns the first index where
+// el is found. If el is not present in the collection IndexOf will return -1.
 func (c *IntCollection) IndexOf(el int) int {
 	for i, item := range c.items {
 		if item == el {
@@ -44,10 +49,14 @@ func (c *IntCollection) IndexOf(el int) int {
 	return -1
 }
 
+// First returns the first item from the collection. Will panic if the
+// underlying slice is empty.
 func (c *IntCollection) First() int {
 	return c.Nth(0)
 }
 
+// FirstN returns a new collection containing the first n items. Will return
+// less than n items if the underlying slice's length is < n.
 func (c *IntCollection) FirstN(n int) *IntCollection {
 	if n > c.Len() {
 		n = c.Len()
@@ -56,10 +65,14 @@ func (c *IntCollection) FirstN(n int) *IntCollection {
 	return c.Slice(0, n)
 }
 
+// Last returns the last item from the collection. Will panic if the underlying
+// slice is empty.
 func (c *IntCollection) Last() int {
 	return c.Nth(c.Len() - 1)
 }
 
+// LastN returns a new collection containing the last n items. Will return less
+// than n items if the underlying slice's length is < n.
 func (c *IntCollection) LastN(n int) *IntCollection {
 	if c.Len()-n < 0 {
 		n = c.Len()
@@ -68,34 +81,41 @@ func (c *IntCollection) LastN(n int) *IntCollection {
 	return c.Slice(c.Len()-n, c.Len())
 }
 
+// Get returns the item at idx from the collection. Will panic if the
+// underlying slice is shorter than idx+1.
 func (c *IntCollection) Get(idx int) int {
 	return c.Nth(idx)
 }
 
+// Nth returns the nth item from the collection. Will panic if the underlying
+// slice is shorter than idx+1.
 func (c *IntCollection) Nth(idx int) int {
 	return c.items[idx]
 }
 
+// Len returns the length of the underlying int slice.
 func (c *IntCollection) Len() int {
 	return len(c.items)
 }
 
+// Cap returns the capacity of the underlying int slice.
 func (c *IntCollection) Cap() int {
 	return cap(c.items)
 }
 
+// Append appends items and returns the collection.
 func (c *IntCollection) Append(items ...int) *IntCollection {
 	c.items = append(c.items, items...)
-
 	return c
 }
 
+// Prepend prepends items and returns the collection.
 func (c *IntCollection) Prepend(items ...int) *IntCollection {
 	c.items = append(items, c.items...)
-
 	return c
 }
 
+// Copy creates a copy of the collection and the underlying int slice.
 func (c *IntCollection) Copy() *IntCollection {
 	s := make([]int, c.Len(), c.Len())
 	copy(s, c.items)
@@ -103,6 +123,8 @@ func (c *IntCollection) Copy() *IntCollection {
 	return NewIntCollection(s)
 }
 
+// Filter removes all items from the collection for which fn evaluates to
+// false and returns c.
 func (c *IntCollection) Filter(fn func(int) bool) *IntCollection {
 	s := c.items[:0]
 
@@ -121,16 +143,23 @@ func (c *IntCollection) Filter(fn func(int) bool) *IntCollection {
 	return c
 }
 
+// Collect removes all items from the collection for which fn evaluates to
+// false and returns c.
 func (c *IntCollection) Collect(fn func(int) bool) *IntCollection {
 	return c.Filter(fn)
 }
 
+// Reject removes all items from the collection for which fn evaluates to
+// true and returns c.
 func (c *IntCollection) Reject(fn func(int) bool) *IntCollection {
 	return c.Filter(func(v int) bool {
 		return !fn(v)
 	})
 }
 
+// Partition partitions the collection into two new collections. The first
+// collection contains all items where fn evaluates to true, the second one all
+// items where fn evaluates to false.
 func (c *IntCollection) Partition(fn func(int) bool) (*IntCollection, *IntCollection) {
 	lhs := make([]int, 0, c.Len())
 	rhs := make([]int, 0, c.Len())
@@ -146,6 +175,8 @@ func (c *IntCollection) Partition(fn func(int) bool) (*IntCollection, *IntCollec
 	return NewIntCollection(lhs), NewIntCollection(rhs)
 }
 
+// Map calls fn for each item in the collection an replaces its value with the
+// result of fn.
 func (c *IntCollection) Map(fn func(int) int) *IntCollection {
 	for i, item := range c.items {
 		c.items[i] = fn(item)
@@ -181,6 +212,7 @@ func (c *IntCollection) FindOk(fn func(int) bool) (int, bool) {
 	return 0, false
 }
 
+// Any returns true as soon as fn evaluates to true for one item in c.
 func (c *IntCollection) Any(fn func(int) bool) bool {
 	for _, item := range c.items {
 		if fn(item) {
@@ -191,6 +223,7 @@ func (c *IntCollection) Any(fn func(int) bool) bool {
 	return false
 }
 
+// All returns true if fn evaluates to true for all items in c.
 func (c *IntCollection) All(fn func(int) bool) bool {
 	for _, item := range c.items {
 		if !fn(item) {
@@ -201,6 +234,7 @@ func (c *IntCollection) All(fn func(int) bool) bool {
 	return true
 }
 
+// Contains returns true if the collection contains el.
 func (c *IntCollection) Contains(el int) bool {
 	for _, item := range c.items {
 		if item == el {
@@ -213,7 +247,6 @@ func (c *IntCollection) Contains(el int) bool {
 
 func (c *IntCollection) Sort(fn func(int, int) bool) *IntCollection {
 	sort.Slice(c.items, c.lessFunc(fn))
-
 	return c
 }
 
@@ -237,7 +270,6 @@ func (c *IntCollection) Reverse() *IntCollection {
 
 func (c *IntCollection) Remove(idx int) *IntCollection {
 	c.items = append(c.items[:idx], c.items[idx+1:]...)
-
 	return c
 }
 
@@ -255,18 +287,15 @@ func (c *IntCollection) InsertItem(item int, idx int) *IntCollection {
 	c.items = append(c.items, 0)
 	copy(c.items[idx+1:], c.items[idx:])
 	c.items[idx] = item
-
 	return c
 }
 
 func (c *IntCollection) Cut(i, j int) *IntCollection {
 	c.items = append(c.items[:i], c.items[j:]...)
-
 	return c
 }
 
 func (c *IntCollection) Slice(i, j int) *IntCollection {
 	c.items = c.items[i:j]
-
 	return c
 }
