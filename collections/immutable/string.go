@@ -310,7 +310,7 @@ func (c *StringCollection) Remove(idx int) *StringCollection {
 func (c *StringCollection) RemoveItem(item string) *StringCollection {
 	d := c.Copy()
 
-	for i, el := range c.items {
+	for i, el := range d.items {
 		if el == item {
 			d.items = append(d.items[:i], d.items[i+1:]...)
 		}

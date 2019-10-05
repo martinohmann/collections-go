@@ -28,6 +28,7 @@ func init() {
 	flag.StringVar(&config.Name, "name", config.Name, "The name of the collection type")
 	flag.StringVar(&config.ItemType, "item-type", config.ItemType, "The item")
 	flag.StringVar(&config.ZeroValue, "zero-value", config.ZeroValue, "The zero value of the item type")
+	flag.StringVar(&config.EqualsFunc, "equals-func", config.EqualsFunc, "Custom equality func. Must have signature func(item-type, item-type) bool.")
 	flag.BoolVar(&config.Immutable, "immutable", config.Immutable, "If set to true, an immutable collection will be generated")
 
 	flag.Usage = func() {
@@ -43,6 +44,7 @@ type Config struct {
 	ZeroValue  string
 	OutputFile string
 	Immutable  bool
+	EqualsFunc string
 }
 
 func (c *Config) validate() error {
@@ -106,6 +108,20 @@ func (c *Config) complete(args []string) error {
 	return nil
 }
 
+func (c *Config) parseTemplate(text string) (*template.Template, error) {
+	return template.New("").
+		Funcs(template.FuncMap{
+			"equals": func(a, b string) string {
+				if len(c.EqualsFunc) > 0 {
+					return fmt.Sprintf("%s(%s, %s)", c.EqualsFunc, a, b)
+				}
+
+				return fmt.Sprintf("%s == %s", a, b)
+			},
+		}).
+		Parse(text)
+}
+
 func main() {
 	flag.Parse()
 
@@ -128,7 +144,7 @@ func main() {
 
 	config.OutputFile = args[0]
 
-	tpl, err := parseTemplate(templates.Collection)
+	tpl, err := config.parseTemplate(templates.Collection)
 	if err != nil {
 		panic(err)
 	}
@@ -155,8 +171,4 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func parseTemplate(text string) (*template.Template, error) {
-	return template.New("").Parse(text)
 }

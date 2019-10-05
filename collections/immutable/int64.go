@@ -310,7 +310,7 @@ func (c *Int64Collection) Remove(idx int) *Int64Collection {
 func (c *Int64Collection) RemoveItem(item int64) *Int64Collection {
 	d := c.Copy()
 
-	for i, el := range c.items {
+	for i, el := range d.items {
 		if el == item {
 			d.items = append(d.items[:i], d.items[i+1:]...)
 		}

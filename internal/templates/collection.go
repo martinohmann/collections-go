@@ -44,7 +44,7 @@ func (c *{{.Name}}) Each(fn func({{.ItemType}})) {
 // el is found. If el is not present in the collection IndexOf will return -1.
 func (c *{{.Name}}) IndexOf(el {{.ItemType}}) int {
 	for i, item := range c.items {
-		if item == el {
+		if {{ equals "item" "el" }} {
 			return i
 		}
 	}
@@ -311,7 +311,7 @@ func (c *{{.Name}}) All(fn func({{.ItemType}}) bool) bool {
 // Contains returns true if the collection contains el.
 func (c *{{.Name}}) Contains(el {{.ItemType}}) bool {
 	for _, item := range c.items {
-		if item == el {
+		if {{ equals "item" "el" }} {
 			return true
 		}
 	}
@@ -394,8 +394,8 @@ func (c *{{.Name}}) RemoveItem(item {{.ItemType}}) *{{.Name}} {
 {{ if .Immutable -}}
 	d := c.Copy()
 
-	for i, el := range c.items {
-		if el == item {
+	for i, el := range d.items {
+		if {{ equals "el" "item" }} {
 			d.items = append(d.items[:i], d.items[i+1:]...)
 		}
 	}
@@ -403,7 +403,7 @@ func (c *{{.Name}}) RemoveItem(item {{.ItemType}}) *{{.Name}} {
 	return d
 {{ else -}}
 	for i, el := range c.items {
-		if el == item {
+		if {{ equals "el" "item" }} {
 			c.items = append(c.items[:i], c.items[i+1:]...)
 		}
 	}

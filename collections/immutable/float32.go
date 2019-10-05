@@ -310,7 +310,7 @@ func (c *Float32Collection) Remove(idx int) *Float32Collection {
 func (c *Float32Collection) RemoveItem(item float32) *Float32Collection {
 	d := c.Copy()
 
-	for i, el := range c.items {
+	for i, el := range d.items {
 		if el == item {
 			d.items = append(d.items[:i], d.items[i+1:]...)
 		}
