@@ -1,28 +1,15 @@
 package collections
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/martinohmann/collections-go/generic/immutable"
 	"github.com/martinohmann/collections-go/internal"
-	collectiontesting "github.com/martinohmann/collections-go/testing"
+	ctesting "github.com/martinohmann/collections-go/testing"
 )
 
 func TestEnsureCollectionMethods(t *testing.T) {
-	collectiontesting.EnsureCollectionMethods(
-		t,
-		reflect.TypeOf((*immutable.Collection)(nil)),
-		reflect.TypeOf((*interface{})(nil)).Elem(),
-	)
-	collectiontesting.EnsureCollectionMethods(
-		t,
-		reflect.TypeOf(&internal.Collection{}),
-		reflect.TypeOf([]*internal.Type{}),
-	)
-	collectiontesting.EnsureCollectionMethods(
-		t,
-		reflect.TypeOf(&internal.ImmutableCollection{}),
-		reflect.TypeOf([]*internal.Type{}),
-	)
+	ctesting.EnsureCollectionMethods(t, &immutable.Collection{}, nil)
+	ctesting.EnsureCollectionMethods(t, &internal.Collection{}, []*internal.Type{})
+	ctesting.EnsureCollectionMethods(t, &internal.ImmutableCollection{}, []*internal.Type{})
 }

@@ -104,7 +104,7 @@ func (c *StringCollection) Cap() int {
 }
 
 // Append appends items and returns the collection. The
-// initial collection will not be modified.
+// original collection will not be modified.
 func (c *StringCollection) Append(items ...string) *StringCollection {
 	d := c.Copy()
 	d.items = append(d.items, items...)
@@ -112,7 +112,7 @@ func (c *StringCollection) Append(items ...string) *StringCollection {
 }
 
 // Prepend prepends items and returns the collection. The
-// initial collection will not be modified.
+// original collection will not be modified.
 func (c *StringCollection) Prepend(items ...string) *StringCollection {
 	d := c.Copy()
 	d.items = append(items, d.items...)
@@ -128,7 +128,7 @@ func (c *StringCollection) Copy() *StringCollection {
 }
 
 // Filter collects all items for which fn evaluates to true into a new
-// collection. The inital collection is not altered.
+// collection. The original collection is not altered.
 func (c *StringCollection) Filter(fn func(string) bool) *StringCollection {
 	d := c.Copy()
 	s := d.items[:0]
@@ -149,13 +149,13 @@ func (c *StringCollection) Filter(fn func(string) bool) *StringCollection {
 }
 
 // Collect collects all items for which fn evaluates to true into a new
-// collection. The inital collection is not altered.
+// collection. The original collection is not altered.
 func (c *StringCollection) Collect(fn func(string) bool) *StringCollection {
 	return c.Filter(fn)
 }
 
 // Reject collects all items for which fn evaluates to false into a new
-// collection. The inital collection is not altered.
+// collection. The original collection is not altered.
 func (c *StringCollection) Reject(fn func(string) bool) *StringCollection {
 	return c.Filter(func(v string) bool {
 		return !fn(v)
@@ -181,7 +181,7 @@ func (c *StringCollection) Partition(fn func(string) bool) (*StringCollection, *
 }
 
 // Map calls fn for each item in the collection an replaces its value with the
-// result of fn. The result is a new collection. The initial
+// result of fn. The result is a new collection. The original
 // collection is not modified.
 func (c *StringCollection) Map(fn func(string) string) *StringCollection {
 	d := c.Copy()

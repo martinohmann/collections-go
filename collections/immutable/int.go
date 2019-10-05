@@ -104,7 +104,7 @@ func (c *IntCollection) Cap() int {
 }
 
 // Append appends items and returns the collection. The
-// initial collection will not be modified.
+// original collection will not be modified.
 func (c *IntCollection) Append(items ...int) *IntCollection {
 	d := c.Copy()
 	d.items = append(d.items, items...)
@@ -112,7 +112,7 @@ func (c *IntCollection) Append(items ...int) *IntCollection {
 }
 
 // Prepend prepends items and returns the collection. The
-// initial collection will not be modified.
+// original collection will not be modified.
 func (c *IntCollection) Prepend(items ...int) *IntCollection {
 	d := c.Copy()
 	d.items = append(items, d.items...)
@@ -128,7 +128,7 @@ func (c *IntCollection) Copy() *IntCollection {
 }
 
 // Filter collects all items for which fn evaluates to true into a new
-// collection. The inital collection is not altered.
+// collection. The original collection is not altered.
 func (c *IntCollection) Filter(fn func(int) bool) *IntCollection {
 	d := c.Copy()
 	s := d.items[:0]
@@ -149,13 +149,13 @@ func (c *IntCollection) Filter(fn func(int) bool) *IntCollection {
 }
 
 // Collect collects all items for which fn evaluates to true into a new
-// collection. The inital collection is not altered.
+// collection. The original collection is not altered.
 func (c *IntCollection) Collect(fn func(int) bool) *IntCollection {
 	return c.Filter(fn)
 }
 
 // Reject collects all items for which fn evaluates to false into a new
-// collection. The inital collection is not altered.
+// collection. The original collection is not altered.
 func (c *IntCollection) Reject(fn func(int) bool) *IntCollection {
 	return c.Filter(func(v int) bool {
 		return !fn(v)
@@ -181,7 +181,7 @@ func (c *IntCollection) Partition(fn func(int) bool) (*IntCollection, *IntCollec
 }
 
 // Map calls fn for each item in the collection an replaces its value with the
-// result of fn. The result is a new collection. The initial
+// result of fn. The result is a new collection. The original
 // collection is not modified.
 func (c *IntCollection) Map(fn func(int) int) *IntCollection {
 	d := c.Copy()

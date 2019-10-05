@@ -6,3 +6,4 @@ package collections
 //go:generate collections-gen --item-type=float32 float32.go
 //go:generate collections-gen --item-type=float64 float64.go
 //go:generate collections-gen --item-type=string string.go
+//go:generate collections-gen --item-type=[]byte --name=ByteSliceCollection --equality-func=bytes.Equal --imports=bytes byte_slice.go

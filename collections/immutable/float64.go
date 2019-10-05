@@ -104,7 +104,7 @@ func (c *Float64Collection) Cap() int {
 }
 
 // Append appends items and returns the collection. The
-// initial collection will not be modified.
+// original collection will not be modified.
 func (c *Float64Collection) Append(items ...float64) *Float64Collection {
 	d := c.Copy()
 	d.items = append(d.items, items...)
@@ -112,7 +112,7 @@ func (c *Float64Collection) Append(items ...float64) *Float64Collection {
 }
 
 // Prepend prepends items and returns the collection. The
-// initial collection will not be modified.
+// original collection will not be modified.
 func (c *Float64Collection) Prepend(items ...float64) *Float64Collection {
 	d := c.Copy()
 	d.items = append(items, d.items...)
@@ -128,7 +128,7 @@ func (c *Float64Collection) Copy() *Float64Collection {
 }
 
 // Filter collects all items for which fn evaluates to true into a new
-// collection. The inital collection is not altered.
+// collection. The original collection is not altered.
 func (c *Float64Collection) Filter(fn func(float64) bool) *Float64Collection {
 	d := c.Copy()
 	s := d.items[:0]
@@ -149,13 +149,13 @@ func (c *Float64Collection) Filter(fn func(float64) bool) *Float64Collection {
 }
 
 // Collect collects all items for which fn evaluates to true into a new
-// collection. The inital collection is not altered.
+// collection. The original collection is not altered.
 func (c *Float64Collection) Collect(fn func(float64) bool) *Float64Collection {
 	return c.Filter(fn)
 }
 
 // Reject collects all items for which fn evaluates to false into a new
-// collection. The inital collection is not altered.
+// collection. The original collection is not altered.
 func (c *Float64Collection) Reject(fn func(float64) bool) *Float64Collection {
 	return c.Filter(func(v float64) bool {
 		return !fn(v)
@@ -181,7 +181,7 @@ func (c *Float64Collection) Partition(fn func(float64) bool) (*Float64Collection
 }
 
 // Map calls fn for each item in the collection an replaces its value with the
-// result of fn. The result is a new collection. The initial
+// result of fn. The result is a new collection. The original
 // collection is not modified.
 func (c *Float64Collection) Map(fn func(float64) float64) *Float64Collection {
 	d := c.Copy()
