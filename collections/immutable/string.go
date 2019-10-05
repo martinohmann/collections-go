@@ -194,6 +194,9 @@ func (c *StringCollection) Map(fn func(string) string) *StringCollection {
 	return d
 }
 
+// Reduce calls fn for each item in c and reduces the result into reducer. The
+// reducer contains the value returned by the call to fn for the previous item.
+// Reducer will be the zero string value on the first invocation.
 func (c *StringCollection) Reduce(fn func(reducer string, item string) string) string {
 	var reducer string
 
@@ -204,12 +207,20 @@ func (c *StringCollection) Reduce(fn func(reducer string, item string) string) s
 	return reducer
 }
 
+// Find returns the first item for which fn evaluates to true. If the
+// collection does not contain a matching item, Find will return the zero
+// string value. If you need to distinguish zero values from a condition
+// that did not match any item consider using FindOk instead.
 func (c *StringCollection) Find(fn func(string) bool) string {
 	item, _ := c.FindOk(fn)
 
 	return item
 }
 
+// FindOk returns the first item for which fn evaluates to true. If the
+// collection does not contain a matching item, FindOk will return the zero
+// string value. The second return value denotes whether the condition
+// matched any item or not.
 func (c *StringCollection) FindOk(fn func(string) bool) (string, bool) {
 	for _, item := range c.items {
 		if fn(item) {
@@ -253,12 +264,17 @@ func (c *StringCollection) Contains(el string) bool {
 	return false
 }
 
+// Sort sorts the collection using the passed in comparator func.
+// The result will be a copy of c which is sorted, the original collection is
+// not altered.
 func (c *StringCollection) Sort(fn func(string, string) bool) *StringCollection {
 	d := c.Copy()
 	sort.Slice(d.items, d.lessFunc(fn))
 	return d
 }
 
+// IsSorted returns true if the collection is sorted in the order defined by
+// the passed in comparator func.
 func (c *StringCollection) IsSorted(fn func(string, string) bool) bool {
 	return sort.SliceIsSorted(c.items, c.lessFunc(fn))
 }
@@ -269,6 +285,8 @@ func (c *StringCollection) lessFunc(fn func(string, string) bool) func(int, int)
 	}
 }
 
+// Reverse copies the collection and returns it with the order of all items
+// reversed.
 func (c *StringCollection) Reverse() *StringCollection {
 	d := c.Copy()
 	for l, r := 0, len(d.items)-1; l < r; l, r = l+1, r-1 {
@@ -278,12 +296,17 @@ func (c *StringCollection) Reverse() *StringCollection {
 	return d
 }
 
+// Remove removes the collection item at position idx. Will panic if idx is out
+// of bounds.
+// The result is a new collection, the original is not modified.
 func (c *StringCollection) Remove(idx int) *StringCollection {
 	d := c.Copy()
 	d.items = append(d.items[:idx], d.items[idx+1:]...)
 	return d
 }
 
+// RemoveItem removes all instances of item from the collection and returns it.
+// The result is a new collection, the original is not modified.
 func (c *StringCollection) RemoveItem(item string) *StringCollection {
 	d := c.Copy()
 
@@ -296,6 +319,9 @@ func (c *StringCollection) RemoveItem(item string) *StringCollection {
 	return d
 }
 
+// InsertItem inserts item into the collection at position idx. Will panic if
+// idx is out of bounds.
+// The result is a new collection, the original is not modified.
 func (c *StringCollection) InsertItem(item string, idx int) *StringCollection {
 	d := c.Copy()
 	d.items = append(d.items, "")
@@ -304,12 +330,18 @@ func (c *StringCollection) InsertItem(item string, idx int) *StringCollection {
 	return d
 }
 
+// Cut removes all items between index i and j from the collection and returns
+// it. Will panic if i or j is out of bounds of the underlying slice.
+// The result is a new collection, the original is not modified.
 func (c *StringCollection) Cut(i, j int) *StringCollection {
 	d := c.Copy()
 	d.items = append(d.items[:i], d.items[j:]...)
 	return d
 }
 
+// Slice replaces the underlying slice of c with the items between i and j and
+// returns the collection. Will panic if i or j is out of bounds.
+// The result is a new collection, the original is not modified.
 func (c *StringCollection) Slice(i, j int) *StringCollection {
 	d := c.Copy()
 	d.items = d.items[i:j]

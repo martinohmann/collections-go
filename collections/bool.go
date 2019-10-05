@@ -186,6 +186,9 @@ func (c *BoolCollection) Map(fn func(bool) bool) *BoolCollection {
 	return c
 }
 
+// Reduce calls fn for each item in c and reduces the result into reducer. The
+// reducer contains the value returned by the call to fn for the previous item.
+// Reducer will be the zero bool value on the first invocation.
 func (c *BoolCollection) Reduce(fn func(reducer bool, item bool) bool) bool {
 	var reducer bool
 
@@ -196,12 +199,20 @@ func (c *BoolCollection) Reduce(fn func(reducer bool, item bool) bool) bool {
 	return reducer
 }
 
+// Find returns the first item for which fn evaluates to true. If the
+// collection does not contain a matching item, Find will return the zero
+// bool value. If you need to distinguish zero values from a condition
+// that did not match any item consider using FindOk instead.
 func (c *BoolCollection) Find(fn func(bool) bool) bool {
 	item, _ := c.FindOk(fn)
 
 	return item
 }
 
+// FindOk returns the first item for which fn evaluates to true. If the
+// collection does not contain a matching item, FindOk will return the zero
+// bool value. The second return value denotes whether the condition
+// matched any item or not.
 func (c *BoolCollection) FindOk(fn func(bool) bool) (bool, bool) {
 	for _, item := range c.items {
 		if fn(item) {
@@ -245,11 +256,14 @@ func (c *BoolCollection) Contains(el bool) bool {
 	return false
 }
 
+// Sort sorts the collection using the passed in comparator func.
 func (c *BoolCollection) Sort(fn func(bool, bool) bool) *BoolCollection {
 	sort.Slice(c.items, c.lessFunc(fn))
 	return c
 }
 
+// IsSorted returns true if the collection is sorted in the order defined by
+// the passed in comparator func.
 func (c *BoolCollection) IsSorted(fn func(bool, bool) bool) bool {
 	return sort.SliceIsSorted(c.items, c.lessFunc(fn))
 }
@@ -260,6 +274,7 @@ func (c *BoolCollection) lessFunc(fn func(bool, bool) bool) func(int, int) bool 
 	}
 }
 
+// Reverse reverses the order of the collection items in place and returns c.
 func (c *BoolCollection) Reverse() *BoolCollection {
 	for l, r := 0, len(c.items)-1; l < r; l, r = l+1, r-1 {
 		c.items[l], c.items[r] = c.items[r], c.items[l]
@@ -268,11 +283,14 @@ func (c *BoolCollection) Reverse() *BoolCollection {
 	return c
 }
 
+// Remove removes the collection item at position idx. Will panic if idx is out
+// of bounds.
 func (c *BoolCollection) Remove(idx int) *BoolCollection {
 	c.items = append(c.items[:idx], c.items[idx+1:]...)
 	return c
 }
 
+// RemoveItem removes all instances of item from the collection and returns it.
 func (c *BoolCollection) RemoveItem(item bool) *BoolCollection {
 	for i, el := range c.items {
 		if el == item {
@@ -283,6 +301,8 @@ func (c *BoolCollection) RemoveItem(item bool) *BoolCollection {
 	return c
 }
 
+// InsertItem inserts item into the collection at position idx. Will panic if
+// idx is out of bounds.
 func (c *BoolCollection) InsertItem(item bool, idx int) *BoolCollection {
 	c.items = append(c.items, false)
 	copy(c.items[idx+1:], c.items[idx:])
@@ -290,11 +310,15 @@ func (c *BoolCollection) InsertItem(item bool, idx int) *BoolCollection {
 	return c
 }
 
+// Cut removes all items between index i and j from the collection and returns
+// it. Will panic if i or j is out of bounds of the underlying slice.
 func (c *BoolCollection) Cut(i, j int) *BoolCollection {
 	c.items = append(c.items[:i], c.items[j:]...)
 	return c
 }
 
+// Slice replaces the underlying slice of c with the items between i and j and
+// returns the collection. Will panic if i or j is out of bounds.
 func (c *BoolCollection) Slice(i, j int) *BoolCollection {
 	c.items = c.items[i:j]
 	return c

@@ -186,6 +186,9 @@ func (c *Float64Collection) Map(fn func(float64) float64) *Float64Collection {
 	return c
 }
 
+// Reduce calls fn for each item in c and reduces the result into reducer. The
+// reducer contains the value returned by the call to fn for the previous item.
+// Reducer will be the zero float64 value on the first invocation.
 func (c *Float64Collection) Reduce(fn func(reducer float64, item float64) float64) float64 {
 	var reducer float64
 
@@ -196,12 +199,20 @@ func (c *Float64Collection) Reduce(fn func(reducer float64, item float64) float6
 	return reducer
 }
 
+// Find returns the first item for which fn evaluates to true. If the
+// collection does not contain a matching item, Find will return the zero
+// float64 value. If you need to distinguish zero values from a condition
+// that did not match any item consider using FindOk instead.
 func (c *Float64Collection) Find(fn func(float64) bool) float64 {
 	item, _ := c.FindOk(fn)
 
 	return item
 }
 
+// FindOk returns the first item for which fn evaluates to true. If the
+// collection does not contain a matching item, FindOk will return the zero
+// float64 value. The second return value denotes whether the condition
+// matched any item or not.
 func (c *Float64Collection) FindOk(fn func(float64) bool) (float64, bool) {
 	for _, item := range c.items {
 		if fn(item) {
@@ -245,11 +256,14 @@ func (c *Float64Collection) Contains(el float64) bool {
 	return false
 }
 
+// Sort sorts the collection using the passed in comparator func.
 func (c *Float64Collection) Sort(fn func(float64, float64) bool) *Float64Collection {
 	sort.Slice(c.items, c.lessFunc(fn))
 	return c
 }
 
+// IsSorted returns true if the collection is sorted in the order defined by
+// the passed in comparator func.
 func (c *Float64Collection) IsSorted(fn func(float64, float64) bool) bool {
 	return sort.SliceIsSorted(c.items, c.lessFunc(fn))
 }
@@ -260,6 +274,7 @@ func (c *Float64Collection) lessFunc(fn func(float64, float64) bool) func(int, i
 	}
 }
 
+// Reverse reverses the order of the collection items in place and returns c.
 func (c *Float64Collection) Reverse() *Float64Collection {
 	for l, r := 0, len(c.items)-1; l < r; l, r = l+1, r-1 {
 		c.items[l], c.items[r] = c.items[r], c.items[l]
@@ -268,11 +283,14 @@ func (c *Float64Collection) Reverse() *Float64Collection {
 	return c
 }
 
+// Remove removes the collection item at position idx. Will panic if idx is out
+// of bounds.
 func (c *Float64Collection) Remove(idx int) *Float64Collection {
 	c.items = append(c.items[:idx], c.items[idx+1:]...)
 	return c
 }
 
+// RemoveItem removes all instances of item from the collection and returns it.
 func (c *Float64Collection) RemoveItem(item float64) *Float64Collection {
 	for i, el := range c.items {
 		if el == item {
@@ -283,6 +301,8 @@ func (c *Float64Collection) RemoveItem(item float64) *Float64Collection {
 	return c
 }
 
+// InsertItem inserts item into the collection at position idx. Will panic if
+// idx is out of bounds.
 func (c *Float64Collection) InsertItem(item float64, idx int) *Float64Collection {
 	c.items = append(c.items, 0.0)
 	copy(c.items[idx+1:], c.items[idx:])
@@ -290,11 +310,15 @@ func (c *Float64Collection) InsertItem(item float64, idx int) *Float64Collection
 	return c
 }
 
+// Cut removes all items between index i and j from the collection and returns
+// it. Will panic if i or j is out of bounds of the underlying slice.
 func (c *Float64Collection) Cut(i, j int) *Float64Collection {
 	c.items = append(c.items[:i], c.items[j:]...)
 	return c
 }
 
+// Slice replaces the underlying slice of c with the items between i and j and
+// returns the collection. Will panic if i or j is out of bounds.
 func (c *Float64Collection) Slice(i, j int) *Float64Collection {
 	c.items = c.items[i:j]
 	return c

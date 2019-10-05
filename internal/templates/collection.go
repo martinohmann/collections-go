@@ -249,6 +249,9 @@ func (c *{{.Name}}) Map(fn func({{.ItemType}}) {{.ItemType}}) *{{.Name}} {
 {{ end -}}
 }
 
+// Reduce calls fn for each item in c and reduces the result into reducer. The
+// reducer contains the value returned by the call to fn for the previous item.
+// Reducer will be the zero {{.ItemType}} value on the first invocation.
 func (c *{{.Name}}) Reduce(fn func(reducer {{.ItemType}}, item {{.ItemType}}) {{.ItemType}}) {{.ItemType}} {
 	var reducer {{.ItemType}}
 
@@ -259,12 +262,20 @@ func (c *{{.Name}}) Reduce(fn func(reducer {{.ItemType}}, item {{.ItemType}}) {{
 	return reducer
 }
 
+// Find returns the first item for which fn evaluates to true. If the
+// collection does not contain a matching item, Find will return the zero
+// {{.ItemType}} value. If you need to distinguish zero values from a condition
+// that did not match any item consider using FindOk instead.
 func (c *{{.Name}}) Find(fn func({{.ItemType}}) bool) {{.ItemType}} {
 	item, _ := c.FindOk(fn)
 
 	return item
 }
 
+// FindOk returns the first item for which fn evaluates to true. If the
+// collection does not contain a matching item, FindOk will return the zero
+// {{.ItemType}} value. The second return value denotes whether the condition
+// matched any item or not.
 func (c *{{.Name}}) FindOk(fn func({{.ItemType}}) bool) ({{.ItemType}}, bool) {
 	for _, item := range c.items {
 		if fn(item) {
@@ -308,6 +319,11 @@ func (c *{{.Name}}) Contains(el {{.ItemType}}) bool {
 	return false
 }
 
+// Sort sorts the collection using the passed in comparator func.
+{{- if .Immutable }}
+// The result will be a copy of c which is sorted, the original collection is
+// not altered.
+{{- end }}
 func (c *{{.Name}}) Sort(fn func({{.ItemType}}, {{.ItemType}}) bool) *{{.Name}} {
 {{ if .Immutable -}}
 	d := c.Copy()
@@ -319,6 +335,8 @@ func (c *{{.Name}}) Sort(fn func({{.ItemType}}, {{.ItemType}}) bool) *{{.Name}} 
 {{ end -}}
 }
 
+// IsSorted returns true if the collection is sorted in the order defined by
+// the passed in comparator func.
 func (c *{{.Name}}) IsSorted(fn func({{.ItemType}}, {{.ItemType}}) bool) bool {
 	return sort.SliceIsSorted(c.items, c.lessFunc(fn))
 }
@@ -329,6 +347,12 @@ func (c *{{.Name}}) lessFunc(fn func({{.ItemType}}, {{.ItemType}}) bool) func(in
 	}
 }
 
+{{ if .Immutable -}}
+// Reverse copies the collection and returns it with the order of all items
+// reversed.
+{{- else -}}
+// Reverse reverses the order of the collection items in place and returns c.
+{{- end}}
 func (c *{{.Name}}) Reverse() *{{.Name}} {
 {{ if .Immutable -}}
 	d := c.Copy()
@@ -346,6 +370,11 @@ func (c *{{.Name}}) Reverse() *{{.Name}} {
 {{ end -}}
 }
 
+// Remove removes the collection item at position idx. Will panic if idx is out
+// of bounds.
+{{- if .Immutable }}
+// The result is a new collection, the original is not modified.
+{{- end }}
 func (c *{{.Name}}) Remove(idx int) *{{.Name}} {
 {{ if .Immutable -}}
 	d := c.Copy()
@@ -357,6 +386,10 @@ func (c *{{.Name}}) Remove(idx int) *{{.Name}} {
 {{ end -}}
 }
 
+// RemoveItem removes all instances of item from the collection and returns it.
+{{- if .Immutable }}
+// The result is a new collection, the original is not modified.
+{{- end }}
 func (c *{{.Name}}) RemoveItem(item {{.ItemType}}) *{{.Name}} {
 {{ if .Immutable -}}
 	d := c.Copy()
@@ -379,6 +412,11 @@ func (c *{{.Name}}) RemoveItem(item {{.ItemType}}) *{{.Name}} {
 {{ end -}}
 }
 
+// InsertItem inserts item into the collection at position idx. Will panic if
+// idx is out of bounds.
+{{- if .Immutable }}
+// The result is a new collection, the original is not modified.
+{{- end }}
 func (c *{{.Name}}) InsertItem(item {{.ItemType}}, idx int) *{{.Name}} {
 {{ if .Immutable -}}
 	d := c.Copy()
@@ -394,6 +432,11 @@ func (c *{{.Name}}) InsertItem(item {{.ItemType}}, idx int) *{{.Name}} {
 {{ end -}}
 }
 
+// Cut removes all items between index i and j from the collection and returns
+// it. Will panic if i or j is out of bounds of the underlying slice.
+{{- if .Immutable }}
+// The result is a new collection, the original is not modified.
+{{- end }}
 func (c *{{.Name}}) Cut(i, j int) *{{.Name}} {
 {{ if .Immutable -}}
 	d := c.Copy()
@@ -405,6 +448,11 @@ func (c *{{.Name}}) Cut(i, j int) *{{.Name}} {
 {{ end -}}
 }
 
+// Slice replaces the underlying slice of c with the items between i and j and
+// returns the collection. Will panic if i or j is out of bounds.
+{{- if .Immutable }}
+// The result is a new collection, the original is not modified.
+{{- end }}
 func (c *{{.Name}}) Slice(i, j int) *{{.Name}} {
 {{ if .Immutable -}}
 	d := c.Copy()
