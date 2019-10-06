@@ -8,6 +8,7 @@ import (
 
 func TestEnsureCollectionMethods(t *testing.T) {
 	// Mutable collections
+	testutil.EnsureCollectionMethods(t, &Generic{}, nil)
 	testutil.EnsureCollectionMethods(t, &Byte{}, ([]byte)(nil))
 	testutil.EnsureCollectionMethods(t, &ByteSlice{}, ([][]byte)(nil))
 	testutil.EnsureCollectionMethods(t, &Float32{}, ([]float32)(nil))
