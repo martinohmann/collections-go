@@ -59,7 +59,7 @@ func (c *String) First() string {
 // less than n items if the underlying slice's length is < n.
 func (c *String) FirstN(n int) *String {
 	if n > c.Len() {
-		n = c.Len()
+		return c
 	}
 
 	return c.Slice(0, n)
@@ -75,7 +75,7 @@ func (c *String) Last() string {
 // than n items if the underlying slice's length is < n.
 func (c *String) LastN(n int) *String {
 	if c.Len()-n < 0 {
-		n = c.Len()
+		return c
 	}
 
 	return c.Slice(c.Len()-n, c.Len())

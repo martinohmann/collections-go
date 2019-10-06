@@ -60,7 +60,7 @@ func (c *ByteSlice) First() []byte {
 // less than n items if the underlying slice's length is < n.
 func (c *ByteSlice) FirstN(n int) *ByteSlice {
 	if n > c.Len() {
-		n = c.Len()
+		return c
 	}
 
 	return c.Slice(0, n)
@@ -76,7 +76,7 @@ func (c *ByteSlice) Last() []byte {
 // than n items if the underlying slice's length is < n.
 func (c *ByteSlice) LastN(n int) *ByteSlice {
 	if c.Len()-n < 0 {
-		n = c.Len()
+		return c
 	}
 
 	return c.Slice(c.Len()-n, c.Len())

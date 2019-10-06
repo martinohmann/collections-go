@@ -59,7 +59,7 @@ func (c *ImmutableFloat64) First() float64 {
 // less than n items if the underlying slice's length is < n.
 func (c *ImmutableFloat64) FirstN(n int) *ImmutableFloat64 {
 	if n > c.Len() {
-		n = c.Len()
+		return c.Copy()
 	}
 
 	return c.Slice(0, n)
@@ -75,7 +75,7 @@ func (c *ImmutableFloat64) Last() float64 {
 // than n items if the underlying slice's length is < n.
 func (c *ImmutableFloat64) LastN(n int) *ImmutableFloat64 {
 	if c.Len()-n < 0 {
-		n = c.Len()
+		return c.Copy()
 	}
 
 	return c.Slice(c.Len()-n, c.Len())

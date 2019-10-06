@@ -66,7 +66,11 @@ func (c *{{.Name}}) First() {{.ItemType}} {
 // less than n items if the underlying slice's length is < n.
 func (c *{{.Name}}) FirstN(n int) *{{.Name}} {
 	if n > c.Len() {
-		n = c.Len()
+{{ if .Immutable -}}
+        return c.Copy()
+{{- else -}}
+		return c
+{{- end }}
 	}
 
 	return c.Slice(0, n)
@@ -82,7 +86,11 @@ func (c *{{.Name}}) Last() {{.ItemType}} {
 // than n items if the underlying slice's length is < n.
 func (c *{{.Name}}) LastN(n int) *{{.Name}} {
 	if c.Len()-n < 0 {
-		n = c.Len()
+{{ if .Immutable -}}
+        return c.Copy()
+{{- else -}}
+		return c
+{{- end }}
 	}
 
 	return c.Slice(c.Len()-n, c.Len())
@@ -150,7 +158,7 @@ func (c *{{.Name}}) Copy() *{{.Name}} {
 {{- else -}}
 // Filter removes all items from the collection for which fn evaluates to
 // false and returns c.
-{{- end}}
+{{- end }}
 func (c *{{.Name}}) Filter(fn func({{.ItemType}}) bool) *{{.Name}} {
 {{ if .Immutable -}}
 	d := c.Copy()

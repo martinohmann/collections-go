@@ -59,7 +59,7 @@ func (c *ImmutableCollection) First() *Type {
 // less than n items if the underlying slice's length is < n.
 func (c *ImmutableCollection) FirstN(n int) *ImmutableCollection {
 	if n > c.Len() {
-		n = c.Len()
+		return c.Copy()
 	}
 
 	return c.Slice(0, n)
@@ -75,7 +75,7 @@ func (c *ImmutableCollection) Last() *Type {
 // than n items if the underlying slice's length is < n.
 func (c *ImmutableCollection) LastN(n int) *ImmutableCollection {
 	if c.Len()-n < 0 {
-		n = c.Len()
+		return c.Copy()
 	}
 
 	return c.Slice(c.Len()-n, c.Len())

@@ -59,7 +59,7 @@ func (c *ImmutableByte) First() byte {
 // less than n items if the underlying slice's length is < n.
 func (c *ImmutableByte) FirstN(n int) *ImmutableByte {
 	if n > c.Len() {
-		n = c.Len()
+		return c.Copy()
 	}
 
 	return c.Slice(0, n)
@@ -75,7 +75,7 @@ func (c *ImmutableByte) Last() byte {
 // than n items if the underlying slice's length is < n.
 func (c *ImmutableByte) LastN(n int) *ImmutableByte {
 	if c.Len()-n < 0 {
-		n = c.Len()
+		return c.Copy()
 	}
 
 	return c.Slice(c.Len()-n, c.Len())
