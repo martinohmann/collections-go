@@ -16,6 +16,12 @@ func NewInt64(items []int64) *Int64 {
 	return &Int64{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *Int64) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of int64 values used by the
 // collection.
 func (c *Int64) Items() []int64 {

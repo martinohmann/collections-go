@@ -74,8 +74,13 @@ func (c *Generic) valueAt(idx int) interface{} {
 	return c.rval.Index(idx).Interface()
 }
 
-// Items returns the underlying slice of string values used by the
-// collection.
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *Generic) Interface() interface{} {
+	return c.items
+}
+
+// Items returns the underlying slice used by the collection.
 func (c *Generic) Items() interface{} {
 	return c.items
 }
@@ -151,12 +156,12 @@ func (c *Generic) Nth(idx int) interface{} {
 	return c.valueAt(idx)
 }
 
-// Len returns the length of the underlying string slice.
+// Len returns the length of the underlying slice.
 func (c *Generic) Len() int {
 	return c.rval.Len()
 }
 
-// Cap returns the capacity of the underlying string slice.
+// Cap returns the capacity of the underlying slice.
 func (c *Generic) Cap() int {
 	return c.rval.Cap()
 }
@@ -193,7 +198,7 @@ func (c *Generic) Prepend(items ...interface{}) *Generic {
 	return c
 }
 
-// Copy creates a copy of the collection and the underlying string slice.
+// Copy creates a copy of the collection and the underlying slice.
 func (c *Generic) Copy() *Generic {
 	s := c.copySlice()
 	return newGeneric(c.sliceType, s, s.Interface())
@@ -264,8 +269,9 @@ func (c *Generic) Map(fn func(interface{}) interface{}) *Generic {
 
 // Reduce calls fn for each item in c and reduces the result into reducer. The
 // reducer contains the value returned by the call to fn for the previous item.
-// Reducer will be the zero string value on the first invocation. Will panic if
-// the value returned by fn is not of the slices element type.
+// Reducer will be the zero value of the slice's element type on the first
+// invocation. Will panic if the value returned by fn is not of the slices
+// element type.
 func (c *Generic) Reduce(fn func(reducer interface{}, item interface{}) interface{}) interface{} {
 	reducer := c.zeroValue
 
@@ -277,9 +283,9 @@ func (c *Generic) Reduce(fn func(reducer interface{}, item interface{}) interfac
 }
 
 // Find returns the first item for which fn evaluates to true. If the
-// collection does not contain a matching item, Find will return the zero
-// string value. If you need to distinguish zero values from a condition
-// that did not match any item consider using FindOk instead.
+// collection does not contain a matching item, Find will return the zero value
+// of the slice's element type. If you need to distinguish zero values from a
+// condition that did not match any item consider using FindOk instead.
 func (c *Generic) Find(fn func(interface{}) bool) interface{} {
 	item, _ := c.FindOk(fn)
 
@@ -288,8 +294,8 @@ func (c *Generic) Find(fn func(interface{}) bool) interface{} {
 
 // FindOk returns the first item for which fn evaluates to true. If the
 // collection does not contain a matching item, FindOk will return the zero
-// string value. The second return value denotes whether the condition
-// matched any item or not.
+// value of the slice's element type. The second return value denotes whether
+// the condition matched any item or not.
 func (c *Generic) FindOk(fn func(interface{}) bool) (interface{}, bool) {
 	for i := 0; i < c.rval.Len(); i++ {
 		item := c.valueAt(i)

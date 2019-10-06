@@ -16,6 +16,12 @@ func NewByte(items []byte) *Byte {
 	return &Byte{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *Byte) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of byte values used by the
 // collection.
 func (c *Byte) Items() []byte {

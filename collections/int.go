@@ -16,6 +16,12 @@ func NewInt(items []int) *Int {
 	return &Int{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *Int) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of int values used by the
 // collection.
 func (c *Int) Items() []int {

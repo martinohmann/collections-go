@@ -16,6 +16,12 @@ func NewImmutableInt64(items []int64) *ImmutableInt64 {
 	return &ImmutableInt64{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *ImmutableInt64) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of int64 values used by the
 // collection.
 func (c *ImmutableInt64) Items() []int64 {

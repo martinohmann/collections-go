@@ -16,6 +16,12 @@ func NewImmutableCollection(items []*Type) *ImmutableCollection {
 	return &ImmutableCollection{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *ImmutableCollection) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of *Type values used by the
 // collection.
 func (c *ImmutableCollection) Items() []*Type {

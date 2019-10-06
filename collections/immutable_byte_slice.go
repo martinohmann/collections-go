@@ -17,6 +17,12 @@ func NewImmutableByteSlice(items [][]byte) *ImmutableByteSlice {
 	return &ImmutableByteSlice{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *ImmutableByteSlice) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of []byte values used by the
 // collection.
 func (c *ImmutableByteSlice) Items() [][]byte {

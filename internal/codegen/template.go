@@ -23,6 +23,12 @@ func New{{.Name|title}}(items []{{.ItemType}}) *{{.Name}} {
 	return &{{.Name}}{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *{{.Name}}) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of {{.ItemType}} values used by the
 // collection.
 func (c *{{.Name}}) Items() []{{.ItemType}} {

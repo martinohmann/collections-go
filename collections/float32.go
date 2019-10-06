@@ -16,6 +16,12 @@ func NewFloat32(items []float32) *Float32 {
 	return &Float32{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *Float32) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of float32 values used by the
 // collection.
 func (c *Float32) Items() []float32 {

@@ -16,6 +16,12 @@ func NewImmutableInt32(items []int32) *ImmutableInt32 {
 	return &ImmutableInt32{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *ImmutableInt32) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of int32 values used by the
 // collection.
 func (c *ImmutableInt32) Items() []int32 {

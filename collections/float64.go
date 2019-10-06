@@ -16,6 +16,12 @@ func NewFloat64(items []float64) *Float64 {
 	return &Float64{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *Float64) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of float64 values used by the
 // collection.
 func (c *Float64) Items() []float64 {

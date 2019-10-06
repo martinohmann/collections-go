@@ -16,6 +16,12 @@ func NewString(items []string) *String {
 	return &String{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *String) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of string values used by the
 // collection.
 func (c *String) Items() []string {

@@ -16,6 +16,12 @@ func NewImmutableFloat32(items []float32) *ImmutableFloat32 {
 	return &ImmutableFloat32{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *ImmutableFloat32) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of float32 values used by the
 // collection.
 func (c *ImmutableFloat32) Items() []float32 {

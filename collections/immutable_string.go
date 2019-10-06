@@ -16,6 +16,12 @@ func NewImmutableString(items []string) *ImmutableString {
 	return &ImmutableString{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *ImmutableString) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of string values used by the
 // collection.
 func (c *ImmutableString) Items() []string {

@@ -16,6 +16,12 @@ func NewCollection(items []*Type) *Collection {
 	return &Collection{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *Collection) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of *Type values used by the
 // collection.
 func (c *Collection) Items() []*Type {

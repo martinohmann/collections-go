@@ -16,6 +16,12 @@ func NewImmutableFloat64(items []float64) *ImmutableFloat64 {
 	return &ImmutableFloat64{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *ImmutableFloat64) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of float64 values used by the
 // collection.
 func (c *ImmutableFloat64) Items() []float64 {

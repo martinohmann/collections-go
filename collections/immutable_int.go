@@ -16,6 +16,12 @@ func NewImmutableInt(items []int) *ImmutableInt {
 	return &ImmutableInt{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *ImmutableInt) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of int values used by the
 // collection.
 func (c *ImmutableInt) Items() []int {

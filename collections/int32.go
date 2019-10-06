@@ -16,6 +16,12 @@ func NewInt32(items []int32) *Int32 {
 	return &Int32{items}
 }
 
+// Interface returns the underlying slice used by the collection as interface{}
+// value.
+func (c *Int32) Interface() interface{} {
+	return c.items
+}
+
 // Items returns the underlying slice of int32 values used by the
 // collection.
 func (c *Int32) Items() []int32 {
