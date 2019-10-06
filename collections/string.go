@@ -134,8 +134,10 @@ func (c *StringCollection) Filter(fn func(string) bool) *StringCollection {
 		}
 	}
 
+	var zeroValue string
+
 	for i := len(s); i < len(c.items); i++ {
-		c.items[i] = ""
+		c.items[i] = zeroValue
 	}
 
 	c.items = s
@@ -220,7 +222,8 @@ func (c *StringCollection) FindOk(fn func(string) bool) (string, bool) {
 		}
 	}
 
-	return "", false
+	var zeroValue string
+	return zeroValue, false
 }
 
 // Any returns true as soon as fn evaluates to true for one item in c.
@@ -304,7 +307,8 @@ func (c *StringCollection) RemoveItem(item string) *StringCollection {
 // InsertItem inserts item into the collection at position idx. Will panic if
 // idx is out of bounds.
 func (c *StringCollection) InsertItem(item string, idx int) *StringCollection {
-	c.items = append(c.items, "")
+	var zeroValue string
+	c.items = append(c.items, zeroValue)
 	copy(c.items[idx+1:], c.items[idx:])
 	c.items[idx] = item
 	return c

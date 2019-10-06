@@ -134,8 +134,10 @@ func (c *Collection) Filter(fn func(*Type) bool) *Collection {
 		}
 	}
 
+	var zeroValue *Type
+
 	for i := len(s); i < len(c.items); i++ {
-		c.items[i] = nil
+		c.items[i] = zeroValue
 	}
 
 	c.items = s
@@ -220,7 +222,8 @@ func (c *Collection) FindOk(fn func(*Type) bool) (*Type, bool) {
 		}
 	}
 
-	return nil, false
+	var zeroValue *Type
+	return zeroValue, false
 }
 
 // Any returns true as soon as fn evaluates to true for one item in c.
@@ -304,7 +307,8 @@ func (c *Collection) RemoveItem(item *Type) *Collection {
 // InsertItem inserts item into the collection at position idx. Will panic if
 // idx is out of bounds.
 func (c *Collection) InsertItem(item *Type, idx int) *Collection {
-	c.items = append(c.items, nil)
+	var zeroValue *Type
+	c.items = append(c.items, zeroValue)
 	copy(c.items[idx+1:], c.items[idx:])
 	c.items[idx] = item
 	return c

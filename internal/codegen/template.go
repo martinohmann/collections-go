@@ -162,8 +162,10 @@ func (c *{{.Name}}) Filter(fn func({{.ItemType}}) bool) *{{.Name}} {
 		}
 	}
 
+	var zeroValue {{.ItemType}}
+
 	for i := len(s); i < len(d.items); i++ {
-		d.items[i] = {{.ZeroValue}}
+		d.items[i] = zeroValue
 	}
 
 	d.items = s
@@ -178,8 +180,10 @@ func (c *{{.Name}}) Filter(fn func({{.ItemType}}) bool) *{{.Name}} {
 		}
 	}
 
+	var zeroValue {{.ItemType}}
+
 	for i := len(s); i < len(c.items); i++ {
-		c.items[i] = {{.ZeroValue}}
+		c.items[i] = zeroValue
 	}
 
 	c.items = s
@@ -287,7 +291,8 @@ func (c *{{.Name}}) FindOk(fn func({{.ItemType}}) bool) ({{.ItemType}}, bool) {
 		}
 	}
 
-	return {{.ZeroValue}}, false
+	var zeroValue {{.ItemType}}
+	return zeroValue, false
 }
 
 // Any returns true as soon as fn evaluates to true for one item in c.
@@ -422,14 +427,15 @@ func (c *{{.Name}}) RemoveItem(item {{.ItemType}}) *{{.Name}} {
 // The result is a new collection, the original is not modified.
 {{- end }}
 func (c *{{.Name}}) InsertItem(item {{.ItemType}}, idx int) *{{.Name}} {
+    var zeroValue {{.ItemType}}
 {{ if .Immutable -}}
 	d := c.Copy()
-	d.items = append(d.items, {{.ZeroValue}})
+	d.items = append(d.items, zeroValue)
 	copy(d.items[idx+1:], d.items[idx:])
 	d.items[idx] = item
 	return d
 {{ else -}}
-	c.items = append(c.items, {{.ZeroValue}})
+	c.items = append(c.items, zeroValue)
 	copy(c.items[idx+1:], c.items[idx:])
 	c.items[idx] = item
 	return c

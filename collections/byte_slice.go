@@ -135,8 +135,10 @@ func (c *ByteSliceCollection) Filter(fn func([]byte) bool) *ByteSliceCollection 
 		}
 	}
 
+	var zeroValue []byte
+
 	for i := len(s); i < len(c.items); i++ {
-		c.items[i] = nil
+		c.items[i] = zeroValue
 	}
 
 	c.items = s
@@ -221,7 +223,8 @@ func (c *ByteSliceCollection) FindOk(fn func([]byte) bool) ([]byte, bool) {
 		}
 	}
 
-	return nil, false
+	var zeroValue []byte
+	return zeroValue, false
 }
 
 // Any returns true as soon as fn evaluates to true for one item in c.
@@ -305,7 +308,8 @@ func (c *ByteSliceCollection) RemoveItem(item []byte) *ByteSliceCollection {
 // InsertItem inserts item into the collection at position idx. Will panic if
 // idx is out of bounds.
 func (c *ByteSliceCollection) InsertItem(item []byte, idx int) *ByteSliceCollection {
-	c.items = append(c.items, nil)
+	var zeroValue []byte
+	c.items = append(c.items, zeroValue)
 	copy(c.items[idx+1:], c.items[idx:])
 	c.items[idx] = item
 	return c

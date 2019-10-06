@@ -139,8 +139,10 @@ func (c *Int64Collection) Filter(fn func(int64) bool) *Int64Collection {
 		}
 	}
 
+	var zeroValue int64
+
 	for i := len(s); i < len(d.items); i++ {
-		d.items[i] = 0
+		d.items[i] = zeroValue
 	}
 
 	d.items = s
@@ -228,7 +230,8 @@ func (c *Int64Collection) FindOk(fn func(int64) bool) (int64, bool) {
 		}
 	}
 
-	return 0, false
+	var zeroValue int64
+	return zeroValue, false
 }
 
 // Any returns true as soon as fn evaluates to true for one item in c.
@@ -323,8 +326,9 @@ func (c *Int64Collection) RemoveItem(item int64) *Int64Collection {
 // idx is out of bounds.
 // The result is a new collection, the original is not modified.
 func (c *Int64Collection) InsertItem(item int64, idx int) *Int64Collection {
+	var zeroValue int64
 	d := c.Copy()
-	d.items = append(d.items, 0)
+	d.items = append(d.items, zeroValue)
 	copy(d.items[idx+1:], d.items[idx:])
 	d.items[idx] = item
 	return d

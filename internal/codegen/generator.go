@@ -11,6 +11,7 @@ import (
 type Parameters struct {
 	Package   string
 	Name      string
+	Exported  string
 	ItemType  string
 	ZeroValue string
 	Immutable bool
@@ -30,9 +31,8 @@ func Generate(c *Config) ([]byte, error) {
 
 	p := &Parameters{
 		Package:   c.Package,
-		Name:      c.Name,
+		Name:      c.getCollectionName(),
 		ItemType:  c.ItemType,
-		ZeroValue: c.ZeroValue,
 		Immutable: c.Immutable,
 		Imports:   imports,
 	}

@@ -134,8 +134,10 @@ func (c *Float64Collection) Filter(fn func(float64) bool) *Float64Collection {
 		}
 	}
 
+	var zeroValue float64
+
 	for i := len(s); i < len(c.items); i++ {
-		c.items[i] = 0.0
+		c.items[i] = zeroValue
 	}
 
 	c.items = s
@@ -220,7 +222,8 @@ func (c *Float64Collection) FindOk(fn func(float64) bool) (float64, bool) {
 		}
 	}
 
-	return 0.0, false
+	var zeroValue float64
+	return zeroValue, false
 }
 
 // Any returns true as soon as fn evaluates to true for one item in c.
@@ -304,7 +307,8 @@ func (c *Float64Collection) RemoveItem(item float64) *Float64Collection {
 // InsertItem inserts item into the collection at position idx. Will panic if
 // idx is out of bounds.
 func (c *Float64Collection) InsertItem(item float64, idx int) *Float64Collection {
-	c.items = append(c.items, 0.0)
+	var zeroValue float64
+	c.items = append(c.items, zeroValue)
 	copy(c.items[idx+1:], c.items[idx:])
 	c.items[idx] = item
 	return c

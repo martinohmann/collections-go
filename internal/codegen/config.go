@@ -16,7 +16,6 @@ type Config struct {
 	Package      string
 	Name         string
 	ItemType     string
-	ZeroValue    string
 	Immutable    bool
 	EqualityFunc string
 	Imports      []string
@@ -33,7 +32,6 @@ func (c *Config) AddFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&c.Package, "package", "p", c.Package, "The package of the generated file")
 	cmd.Flags().StringVarP(&c.Name, "name", "n", c.Name, "The name of the collection type")
 	cmd.Flags().StringVarP(&c.ItemType, "item-type", "t", c.ItemType, "The item")
-	cmd.Flags().StringVarP(&c.ZeroValue, "zero-value", "z", c.ZeroValue, "The zero value of the item type")
 	cmd.Flags().StringVarP(&c.EqualityFunc, "equality-func", "e", c.EqualityFunc, "Custom equality func. Must have signature func(item-type, item-type) bool.")
 	cmd.Flags().BoolVarP(&c.Immutable, "immutable", "i", c.Immutable, "If set to true, an immutable collection will be generated")
 	cmd.Flags().StringSliceVar(&c.Imports, "imports", c.Imports, "Additional imports to add to the generated code. Use this to import types or the equals func from a different package. Format: [alias=]fullPkgPath")
@@ -58,11 +56,9 @@ func (c *Config) Validate() error {
 func (c *Config) Complete(args []string) error {
 	c.OutputFile = args[0]
 
-	c.ensureName()
-
 	c.ensureEqualityFunc()
 
-	return c.ensureZeroValue()
+	return nil
 }
 
 func (c *Config) ensureEqualityFunc() {
@@ -81,49 +77,12 @@ func (c *Config) ensureEqualityFunc() {
 	c.Imports = append(c.Imports, "reflect")
 }
 
-func (c *Config) ensureZeroValue() error {
-	if len(c.ZeroValue) > 0 {
-		return nil
-	}
-
-	if c.ItemType[0] == '*' || strings.HasPrefix(c.ItemType, "[]") || strings.HasPrefix(c.ItemType, "map[") {
-		c.ZeroValue = "nil"
-		return nil
-	}
-
-	switch c.ItemType {
-	case "bool":
-		c.ZeroValue = "false"
-	case "int", "int8", "int16", "int32", "int64":
-		c.ZeroValue = "0"
-	case "uint", "uint8", "uint16", "uint32", "uint64":
-		c.ZeroValue = "0"
-	case "byte", "rune", "uintptr":
-		c.ZeroValue = "0"
-	case "float32", "float64", "complex64", "complex128":
-		c.ZeroValue = "0.0"
-	case "string":
-		c.ZeroValue = `""`
-	case "interface{}", "error":
-		c.ZeroValue = `nil`
-	}
-
-	if len(c.ZeroValue) == 0 {
-		return fmt.Errorf(
-			"cannot guess zero value for type %q, please provide it via the --zero-value flag",
-			c.ItemType,
-		)
-	}
-
-	return nil
-}
-
-func (c *Config) ensureName() {
+func (c *Config) getCollectionName() string {
 	if c.Name != "" {
-		return
+		return c.Name
 	}
 
 	itemType := nonAlphaRegexp.ReplaceAllString(c.ItemType, "")
 
-	c.Name = fmt.Sprintf("%sCollection", strings.Title(itemType))
+	return fmt.Sprintf("%sCollection", strings.Title(itemType))
 }

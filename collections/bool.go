@@ -134,8 +134,10 @@ func (c *BoolCollection) Filter(fn func(bool) bool) *BoolCollection {
 		}
 	}
 
+	var zeroValue bool
+
 	for i := len(s); i < len(c.items); i++ {
-		c.items[i] = false
+		c.items[i] = zeroValue
 	}
 
 	c.items = s
@@ -220,7 +222,8 @@ func (c *BoolCollection) FindOk(fn func(bool) bool) (bool, bool) {
 		}
 	}
 
-	return false, false
+	var zeroValue bool
+	return zeroValue, false
 }
 
 // Any returns true as soon as fn evaluates to true for one item in c.
@@ -304,7 +307,8 @@ func (c *BoolCollection) RemoveItem(item bool) *BoolCollection {
 // InsertItem inserts item into the collection at position idx. Will panic if
 // idx is out of bounds.
 func (c *BoolCollection) InsertItem(item bool, idx int) *BoolCollection {
-	c.items = append(c.items, false)
+	var zeroValue bool
+	c.items = append(c.items, zeroValue)
 	copy(c.items[idx+1:], c.items[idx:])
 	c.items[idx] = item
 	return c

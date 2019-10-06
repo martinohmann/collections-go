@@ -139,8 +139,10 @@ func (c *ImmutableCollection) Filter(fn func(*Type) bool) *ImmutableCollection {
 		}
 	}
 
+	var zeroValue *Type
+
 	for i := len(s); i < len(d.items); i++ {
-		d.items[i] = nil
+		d.items[i] = zeroValue
 	}
 
 	d.items = s
@@ -228,7 +230,8 @@ func (c *ImmutableCollection) FindOk(fn func(*Type) bool) (*Type, bool) {
 		}
 	}
 
-	return nil, false
+	var zeroValue *Type
+	return zeroValue, false
 }
 
 // Any returns true as soon as fn evaluates to true for one item in c.
@@ -323,8 +326,9 @@ func (c *ImmutableCollection) RemoveItem(item *Type) *ImmutableCollection {
 // idx is out of bounds.
 // The result is a new collection, the original is not modified.
 func (c *ImmutableCollection) InsertItem(item *Type, idx int) *ImmutableCollection {
+	var zeroValue *Type
 	d := c.Copy()
-	d.items = append(d.items, nil)
+	d.items = append(d.items, zeroValue)
 	copy(d.items[idx+1:], d.items[idx:])
 	d.items[idx] = item
 	return d
