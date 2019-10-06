@@ -1,10 +1,9 @@
-package internal
+package validation
 
 import (
 	"fmt"
 	"reflect"
 
-	"github.com/martinohmann/collections-go/internal/method"
 	"github.com/pkg/errors"
 )
 
@@ -14,7 +13,10 @@ type collectionTypes struct {
 	elem  reflect.Type
 }
 
-func EnsureCollectionMethods(objType, sliceType reflect.Type) error {
+func ValidateCollection(obj, slice interface{}) error {
+	objType := reflect.TypeOf(obj)
+	sliceType := reflect.TypeOf(slice)
+
 	if sliceType == nil {
 		sliceType = reflect.TypeOf((*interface{})(nil)).Elem()
 	}
@@ -30,13 +32,13 @@ func EnsureCollectionMethods(objType, sliceType reflect.Type) error {
 		elem:  elemType,
 	}
 
-	for methodName, signature := range method.CollectionMethods {
+	for methodName, signature := range MethodMap {
 		m, ok := objType.MethodByName(methodName)
 		if !ok {
 			return errors.Errorf("%s does not have expected method %s", objType, methodName)
 		}
 
-		err := ensureSignature(methodName, types, m.Type, signature)
+		err := validateSignature(methodName, types, m.Type, signature)
 		if err != nil {
 			return errors.Wrapf(err, "while validating type %s", objType)
 		}
@@ -56,7 +58,7 @@ func getElemType(sliceType reflect.Type) reflect.Type {
 	return nil
 }
 
-func getExpectedType(param method.Parameter, types collectionTypes) reflect.Type {
+func getExpectedType(param Parameter, types collectionTypes) reflect.Type {
 	switch {
 	case param.ElementType:
 		return types.elem
@@ -69,7 +71,7 @@ func getExpectedType(param method.Parameter, types collectionTypes) reflect.Type
 	return nil
 }
 
-func ensureSignature(methodName string, types collectionTypes, methodType reflect.Type, sig method.Signature) error {
+func validateSignature(methodName string, types collectionTypes, methodType reflect.Type, sig Signature) error {
 	if sig.Variadic && !methodType.IsVariadic() {
 		return errors.Errorf("expected method %s to be variadic but it is not", methodName)
 	} else if !sig.Variadic && methodType.IsVariadic() {
@@ -81,7 +83,7 @@ func ensureSignature(methodName string, types collectionTypes, methodType reflec
 	}
 
 	for i := 0; i < methodType.NumIn(); i++ {
-		err := ensureParameter("input", methodName, i, types, methodType.In(i), sig.In[i])
+		err := validateParameter("input", methodName, i, types, methodType.In(i), sig.In[i])
 		if err != nil {
 			return err
 		}
@@ -92,7 +94,7 @@ func ensureSignature(methodName string, types collectionTypes, methodType reflec
 	}
 
 	for i := 0; i < methodType.NumOut(); i++ {
-		err := ensureParameter("output", methodName, i, types, methodType.Out(i), sig.Out[i])
+		err := validateParameter("output", methodName, i, types, methodType.Out(i), sig.Out[i])
 		if err != nil {
 			return err
 		}
@@ -101,7 +103,7 @@ func ensureSignature(methodName string, types collectionTypes, methodType reflec
 	return nil
 }
 
-func ensureParameter(paramType, methodName string, index int, types collectionTypes, p reflect.Type, s method.Parameter) error {
+func validateParameter(paramType, methodName string, index int, types collectionTypes, p reflect.Type, s Parameter) error {
 	expectedType := getExpectedType(s, types)
 
 	if expectedType != nil {
@@ -117,7 +119,7 @@ func ensureParameter(paramType, methodName string, index int, types collectionTy
 	}
 
 	if p.Kind() == reflect.Func {
-		return ensureSignature(fmt.Sprintf("%s.#%d.func", methodName, index), types, p, s.FuncSignature)
+		return validateSignature(fmt.Sprintf("%s.#%d.func", methodName, index), types, p, s.FuncSignature)
 	}
 
 	return nil

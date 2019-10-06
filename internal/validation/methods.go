@@ -1,10 +1,27 @@
-package method
+package validation
 
 import (
 	"reflect"
 )
 
-var CollectionMethods = map[string]Signature{
+type Parameter struct {
+	Type           reflect.Type
+	Kind           reflect.Kind
+	FuncSignature  Signature
+	ElementType    bool
+	CollectionType bool
+	SliceType      bool
+}
+
+type Signature struct {
+	NumIn    int
+	NumOut   int
+	In       []Parameter
+	Out      []Parameter
+	Variadic bool
+}
+
+var MethodMap = map[string]Signature{
 	"All": Signature{
 		In: []Parameter{
 			{
