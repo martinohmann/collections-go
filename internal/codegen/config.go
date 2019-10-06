@@ -34,7 +34,7 @@ func (c *Config) AddFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&c.ItemType, "item-type", "t", c.ItemType, "The item")
 	cmd.Flags().StringVarP(&c.EqualityFunc, "equality-func", "e", c.EqualityFunc, "Custom equality func. Must have signature func(item-type, item-type) bool.")
 	cmd.Flags().BoolVarP(&c.Immutable, "immutable", "i", c.Immutable, "If set to true, an immutable collection will be generated")
-	cmd.Flags().StringSliceVar(&c.Imports, "imports", c.Imports, "Additional imports to add to the generated code. Use this to import types or the equals func from a different package. Format: [alias=]fullPkgPath")
+	cmd.Flags().StringSliceVarP(&c.Imports, "imports", "I", c.Imports, "Additional imports to add to the generated code. Use this to import types or the equals func from a different package. Format: [alias=]fullPkgPath")
 }
 
 func (c *Config) Validate() error {

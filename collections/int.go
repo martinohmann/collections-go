@@ -6,32 +6,32 @@ import (
 	"sort"
 )
 
-// IntCollection is a collection of int values.
-type IntCollection struct {
+// Int is a collection of int values.
+type Int struct {
 	items []int
 }
 
-// NewIntCollection creates a new collection from a slice of int.
-func NewIntCollection(items []int) *IntCollection {
-	return &IntCollection{items}
+// NewInt creates a new collection from a slice of int.
+func NewInt(items []int) *Int {
+	return &Int{items}
 }
 
 // Items returns the underlying slice of int values used by the
 // collection.
-func (c *IntCollection) Items() []int {
+func (c *Int) Items() []int {
 	return c.items
 }
 
 // EachIndex calls fn for every item in the collection. The slice index of the
 // item is passed to fn as the second argument.
-func (c *IntCollection) EachIndex(fn func(int, int)) {
+func (c *Int) EachIndex(fn func(int, int)) {
 	for i, item := range c.items {
 		fn(item, i)
 	}
 }
 
 // Each calls fn for every item in the collection.
-func (c *IntCollection) Each(fn func(int)) {
+func (c *Int) Each(fn func(int)) {
 	c.EachIndex(func(item int, _ int) {
 		fn(item)
 	})
@@ -39,7 +39,7 @@ func (c *IntCollection) Each(fn func(int)) {
 
 // IndexOf searches for el in the collection and returns the first index where
 // el is found. If el is not present in the collection IndexOf will return -1.
-func (c *IntCollection) IndexOf(el int) int {
+func (c *Int) IndexOf(el int) int {
 	for i, item := range c.items {
 		if item == el {
 			return i
@@ -51,13 +51,13 @@ func (c *IntCollection) IndexOf(el int) int {
 
 // First returns the first item from the collection. Will panic if the
 // underlying slice is empty.
-func (c *IntCollection) First() int {
+func (c *Int) First() int {
 	return c.Nth(0)
 }
 
 // FirstN returns a new collection containing the first n items. Will return
 // less than n items if the underlying slice's length is < n.
-func (c *IntCollection) FirstN(n int) *IntCollection {
+func (c *Int) FirstN(n int) *Int {
 	if n > c.Len() {
 		n = c.Len()
 	}
@@ -67,13 +67,13 @@ func (c *IntCollection) FirstN(n int) *IntCollection {
 
 // Last returns the last item from the collection. Will panic if the underlying
 // slice is empty.
-func (c *IntCollection) Last() int {
+func (c *Int) Last() int {
 	return c.Nth(c.Len() - 1)
 }
 
 // LastN returns a new collection containing the last n items. Will return less
 // than n items if the underlying slice's length is < n.
-func (c *IntCollection) LastN(n int) *IntCollection {
+func (c *Int) LastN(n int) *Int {
 	if c.Len()-n < 0 {
 		n = c.Len()
 	}
@@ -83,49 +83,49 @@ func (c *IntCollection) LastN(n int) *IntCollection {
 
 // Get returns the item at idx from the collection. Will panic if the
 // underlying slice is shorter than idx+1.
-func (c *IntCollection) Get(idx int) int {
+func (c *Int) Get(idx int) int {
 	return c.Nth(idx)
 }
 
 // Nth returns the nth item from the collection. Will panic if the underlying
 // slice is shorter than idx+1.
-func (c *IntCollection) Nth(idx int) int {
+func (c *Int) Nth(idx int) int {
 	return c.items[idx]
 }
 
 // Len returns the length of the underlying int slice.
-func (c *IntCollection) Len() int {
+func (c *Int) Len() int {
 	return len(c.items)
 }
 
 // Cap returns the capacity of the underlying int slice.
-func (c *IntCollection) Cap() int {
+func (c *Int) Cap() int {
 	return cap(c.items)
 }
 
 // Append appends items and returns the collection.
-func (c *IntCollection) Append(items ...int) *IntCollection {
+func (c *Int) Append(items ...int) *Int {
 	c.items = append(c.items, items...)
 	return c
 }
 
 // Prepend prepends items and returns the collection.
-func (c *IntCollection) Prepend(items ...int) *IntCollection {
+func (c *Int) Prepend(items ...int) *Int {
 	c.items = append(items, c.items...)
 	return c
 }
 
 // Copy creates a copy of the collection and the underlying int slice.
-func (c *IntCollection) Copy() *IntCollection {
+func (c *Int) Copy() *Int {
 	s := make([]int, c.Len(), c.Len())
 	copy(s, c.items)
 
-	return NewIntCollection(s)
+	return NewInt(s)
 }
 
 // Filter removes all items from the collection for which fn evaluates to
 // false and returns c.
-func (c *IntCollection) Filter(fn func(int) bool) *IntCollection {
+func (c *Int) Filter(fn func(int) bool) *Int {
 	s := c.items[:0]
 
 	for _, item := range c.items {
@@ -147,13 +147,13 @@ func (c *IntCollection) Filter(fn func(int) bool) *IntCollection {
 
 // Collect removes all items from the collection for which fn evaluates to
 // false and returns c.
-func (c *IntCollection) Collect(fn func(int) bool) *IntCollection {
+func (c *Int) Collect(fn func(int) bool) *Int {
 	return c.Filter(fn)
 }
 
 // Reject removes all items from the collection for which fn evaluates to
 // true and returns c.
-func (c *IntCollection) Reject(fn func(int) bool) *IntCollection {
+func (c *Int) Reject(fn func(int) bool) *Int {
 	return c.Filter(func(v int) bool {
 		return !fn(v)
 	})
@@ -162,7 +162,7 @@ func (c *IntCollection) Reject(fn func(int) bool) *IntCollection {
 // Partition partitions the collection into two new collections. The first
 // collection contains all items where fn evaluates to true, the second one all
 // items where fn evaluates to false.
-func (c *IntCollection) Partition(fn func(int) bool) (*IntCollection, *IntCollection) {
+func (c *Int) Partition(fn func(int) bool) (*Int, *Int) {
 	lhs := make([]int, 0, c.Len())
 	rhs := make([]int, 0, c.Len())
 
@@ -174,12 +174,12 @@ func (c *IntCollection) Partition(fn func(int) bool) (*IntCollection, *IntCollec
 		}
 	}
 
-	return NewIntCollection(lhs), NewIntCollection(rhs)
+	return NewInt(lhs), NewInt(rhs)
 }
 
 // Map calls fn for each item in the collection an replaces its value with the
 // result of fn.
-func (c *IntCollection) Map(fn func(int) int) *IntCollection {
+func (c *Int) Map(fn func(int) int) *Int {
 	for i, item := range c.items {
 		c.items[i] = fn(item)
 
@@ -191,7 +191,7 @@ func (c *IntCollection) Map(fn func(int) int) *IntCollection {
 // Reduce calls fn for each item in c and reduces the result into reducer. The
 // reducer contains the value returned by the call to fn for the previous item.
 // Reducer will be the zero int value on the first invocation.
-func (c *IntCollection) Reduce(fn func(reducer int, item int) int) int {
+func (c *Int) Reduce(fn func(reducer int, item int) int) int {
 	var reducer int
 
 	for _, item := range c.items {
@@ -205,7 +205,7 @@ func (c *IntCollection) Reduce(fn func(reducer int, item int) int) int {
 // collection does not contain a matching item, Find will return the zero
 // int value. If you need to distinguish zero values from a condition
 // that did not match any item consider using FindOk instead.
-func (c *IntCollection) Find(fn func(int) bool) int {
+func (c *Int) Find(fn func(int) bool) int {
 	item, _ := c.FindOk(fn)
 
 	return item
@@ -215,7 +215,7 @@ func (c *IntCollection) Find(fn func(int) bool) int {
 // collection does not contain a matching item, FindOk will return the zero
 // int value. The second return value denotes whether the condition
 // matched any item or not.
-func (c *IntCollection) FindOk(fn func(int) bool) (int, bool) {
+func (c *Int) FindOk(fn func(int) bool) (int, bool) {
 	for _, item := range c.items {
 		if fn(item) {
 			return item, true
@@ -227,7 +227,7 @@ func (c *IntCollection) FindOk(fn func(int) bool) (int, bool) {
 }
 
 // Any returns true as soon as fn evaluates to true for one item in c.
-func (c *IntCollection) Any(fn func(int) bool) bool {
+func (c *Int) Any(fn func(int) bool) bool {
 	for _, item := range c.items {
 		if fn(item) {
 			return true
@@ -238,7 +238,7 @@ func (c *IntCollection) Any(fn func(int) bool) bool {
 }
 
 // All returns true if fn evaluates to true for all items in c.
-func (c *IntCollection) All(fn func(int) bool) bool {
+func (c *Int) All(fn func(int) bool) bool {
 	for _, item := range c.items {
 		if !fn(item) {
 			return false
@@ -249,7 +249,7 @@ func (c *IntCollection) All(fn func(int) bool) bool {
 }
 
 // Contains returns true if the collection contains el.
-func (c *IntCollection) Contains(el int) bool {
+func (c *Int) Contains(el int) bool {
 	for _, item := range c.items {
 		if item == el {
 			return true
@@ -260,25 +260,25 @@ func (c *IntCollection) Contains(el int) bool {
 }
 
 // Sort sorts the collection using the passed in comparator func.
-func (c *IntCollection) Sort(fn func(int, int) bool) *IntCollection {
+func (c *Int) Sort(fn func(int, int) bool) *Int {
 	sort.Slice(c.items, c.lessFunc(fn))
 	return c
 }
 
 // IsSorted returns true if the collection is sorted in the order defined by
 // the passed in comparator func.
-func (c *IntCollection) IsSorted(fn func(int, int) bool) bool {
+func (c *Int) IsSorted(fn func(int, int) bool) bool {
 	return sort.SliceIsSorted(c.items, c.lessFunc(fn))
 }
 
-func (c *IntCollection) lessFunc(fn func(int, int) bool) func(int, int) bool {
+func (c *Int) lessFunc(fn func(int, int) bool) func(int, int) bool {
 	return func(i, j int) bool {
 		return fn(c.items[i], c.items[j])
 	}
 }
 
 // Reverse reverses the order of the collection items in place and returns c.
-func (c *IntCollection) Reverse() *IntCollection {
+func (c *Int) Reverse() *Int {
 	for l, r := 0, len(c.items)-1; l < r; l, r = l+1, r-1 {
 		c.items[l], c.items[r] = c.items[r], c.items[l]
 	}
@@ -288,13 +288,13 @@ func (c *IntCollection) Reverse() *IntCollection {
 
 // Remove removes the collection item at position idx. Will panic if idx is out
 // of bounds.
-func (c *IntCollection) Remove(idx int) *IntCollection {
+func (c *Int) Remove(idx int) *Int {
 	c.items = append(c.items[:idx], c.items[idx+1:]...)
 	return c
 }
 
 // RemoveItem removes all instances of item from the collection and returns it.
-func (c *IntCollection) RemoveItem(item int) *IntCollection {
+func (c *Int) RemoveItem(item int) *Int {
 	for i, el := range c.items {
 		if el == item {
 			c.items = append(c.items[:i], c.items[i+1:]...)
@@ -306,7 +306,7 @@ func (c *IntCollection) RemoveItem(item int) *IntCollection {
 
 // InsertItem inserts item into the collection at position idx. Will panic if
 // idx is out of bounds.
-func (c *IntCollection) InsertItem(item int, idx int) *IntCollection {
+func (c *Int) InsertItem(item int, idx int) *Int {
 	var zeroValue int
 	c.items = append(c.items, zeroValue)
 	copy(c.items[idx+1:], c.items[idx:])
@@ -316,14 +316,14 @@ func (c *IntCollection) InsertItem(item int, idx int) *IntCollection {
 
 // Cut removes all items between index i and j from the collection and returns
 // it. Will panic if i or j is out of bounds of the underlying slice.
-func (c *IntCollection) Cut(i, j int) *IntCollection {
+func (c *Int) Cut(i, j int) *Int {
 	c.items = append(c.items[:i], c.items[j:]...)
 	return c
 }
 
 // Slice replaces the underlying slice of c with the items between i and j and
 // returns the collection. Will panic if i or j is out of bounds.
-func (c *IntCollection) Slice(i, j int) *IntCollection {
+func (c *Int) Slice(i, j int) *Int {
 	c.items = c.items[i:j]
 	return c
 }

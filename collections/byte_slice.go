@@ -7,32 +7,32 @@ import (
 	"sort"
 )
 
-// ByteSliceCollection is a collection of []byte values.
-type ByteSliceCollection struct {
+// ByteSlice is a collection of []byte values.
+type ByteSlice struct {
 	items [][]byte
 }
 
-// NewByteSliceCollection creates a new collection from a slice of []byte.
-func NewByteSliceCollection(items [][]byte) *ByteSliceCollection {
-	return &ByteSliceCollection{items}
+// NewByteSlice creates a new collection from a slice of []byte.
+func NewByteSlice(items [][]byte) *ByteSlice {
+	return &ByteSlice{items}
 }
 
 // Items returns the underlying slice of []byte values used by the
 // collection.
-func (c *ByteSliceCollection) Items() [][]byte {
+func (c *ByteSlice) Items() [][]byte {
 	return c.items
 }
 
 // EachIndex calls fn for every item in the collection. The slice index of the
 // item is passed to fn as the second argument.
-func (c *ByteSliceCollection) EachIndex(fn func([]byte, int)) {
+func (c *ByteSlice) EachIndex(fn func([]byte, int)) {
 	for i, item := range c.items {
 		fn(item, i)
 	}
 }
 
 // Each calls fn for every item in the collection.
-func (c *ByteSliceCollection) Each(fn func([]byte)) {
+func (c *ByteSlice) Each(fn func([]byte)) {
 	c.EachIndex(func(item []byte, _ int) {
 		fn(item)
 	})
@@ -40,7 +40,7 @@ func (c *ByteSliceCollection) Each(fn func([]byte)) {
 
 // IndexOf searches for el in the collection and returns the first index where
 // el is found. If el is not present in the collection IndexOf will return -1.
-func (c *ByteSliceCollection) IndexOf(el []byte) int {
+func (c *ByteSlice) IndexOf(el []byte) int {
 	for i, item := range c.items {
 		if bytes.Equal(item, el) {
 			return i
@@ -52,13 +52,13 @@ func (c *ByteSliceCollection) IndexOf(el []byte) int {
 
 // First returns the first item from the collection. Will panic if the
 // underlying slice is empty.
-func (c *ByteSliceCollection) First() []byte {
+func (c *ByteSlice) First() []byte {
 	return c.Nth(0)
 }
 
 // FirstN returns a new collection containing the first n items. Will return
 // less than n items if the underlying slice's length is < n.
-func (c *ByteSliceCollection) FirstN(n int) *ByteSliceCollection {
+func (c *ByteSlice) FirstN(n int) *ByteSlice {
 	if n > c.Len() {
 		n = c.Len()
 	}
@@ -68,13 +68,13 @@ func (c *ByteSliceCollection) FirstN(n int) *ByteSliceCollection {
 
 // Last returns the last item from the collection. Will panic if the underlying
 // slice is empty.
-func (c *ByteSliceCollection) Last() []byte {
+func (c *ByteSlice) Last() []byte {
 	return c.Nth(c.Len() - 1)
 }
 
 // LastN returns a new collection containing the last n items. Will return less
 // than n items if the underlying slice's length is < n.
-func (c *ByteSliceCollection) LastN(n int) *ByteSliceCollection {
+func (c *ByteSlice) LastN(n int) *ByteSlice {
 	if c.Len()-n < 0 {
 		n = c.Len()
 	}
@@ -84,49 +84,49 @@ func (c *ByteSliceCollection) LastN(n int) *ByteSliceCollection {
 
 // Get returns the item at idx from the collection. Will panic if the
 // underlying slice is shorter than idx+1.
-func (c *ByteSliceCollection) Get(idx int) []byte {
+func (c *ByteSlice) Get(idx int) []byte {
 	return c.Nth(idx)
 }
 
 // Nth returns the nth item from the collection. Will panic if the underlying
 // slice is shorter than idx+1.
-func (c *ByteSliceCollection) Nth(idx int) []byte {
+func (c *ByteSlice) Nth(idx int) []byte {
 	return c.items[idx]
 }
 
 // Len returns the length of the underlying []byte slice.
-func (c *ByteSliceCollection) Len() int {
+func (c *ByteSlice) Len() int {
 	return len(c.items)
 }
 
 // Cap returns the capacity of the underlying []byte slice.
-func (c *ByteSliceCollection) Cap() int {
+func (c *ByteSlice) Cap() int {
 	return cap(c.items)
 }
 
 // Append appends items and returns the collection.
-func (c *ByteSliceCollection) Append(items ...[]byte) *ByteSliceCollection {
+func (c *ByteSlice) Append(items ...[]byte) *ByteSlice {
 	c.items = append(c.items, items...)
 	return c
 }
 
 // Prepend prepends items and returns the collection.
-func (c *ByteSliceCollection) Prepend(items ...[]byte) *ByteSliceCollection {
+func (c *ByteSlice) Prepend(items ...[]byte) *ByteSlice {
 	c.items = append(items, c.items...)
 	return c
 }
 
 // Copy creates a copy of the collection and the underlying []byte slice.
-func (c *ByteSliceCollection) Copy() *ByteSliceCollection {
+func (c *ByteSlice) Copy() *ByteSlice {
 	s := make([][]byte, c.Len(), c.Len())
 	copy(s, c.items)
 
-	return NewByteSliceCollection(s)
+	return NewByteSlice(s)
 }
 
 // Filter removes all items from the collection for which fn evaluates to
 // false and returns c.
-func (c *ByteSliceCollection) Filter(fn func([]byte) bool) *ByteSliceCollection {
+func (c *ByteSlice) Filter(fn func([]byte) bool) *ByteSlice {
 	s := c.items[:0]
 
 	for _, item := range c.items {
@@ -148,13 +148,13 @@ func (c *ByteSliceCollection) Filter(fn func([]byte) bool) *ByteSliceCollection 
 
 // Collect removes all items from the collection for which fn evaluates to
 // false and returns c.
-func (c *ByteSliceCollection) Collect(fn func([]byte) bool) *ByteSliceCollection {
+func (c *ByteSlice) Collect(fn func([]byte) bool) *ByteSlice {
 	return c.Filter(fn)
 }
 
 // Reject removes all items from the collection for which fn evaluates to
 // true and returns c.
-func (c *ByteSliceCollection) Reject(fn func([]byte) bool) *ByteSliceCollection {
+func (c *ByteSlice) Reject(fn func([]byte) bool) *ByteSlice {
 	return c.Filter(func(v []byte) bool {
 		return !fn(v)
 	})
@@ -163,7 +163,7 @@ func (c *ByteSliceCollection) Reject(fn func([]byte) bool) *ByteSliceCollection 
 // Partition partitions the collection into two new collections. The first
 // collection contains all items where fn evaluates to true, the second one all
 // items where fn evaluates to false.
-func (c *ByteSliceCollection) Partition(fn func([]byte) bool) (*ByteSliceCollection, *ByteSliceCollection) {
+func (c *ByteSlice) Partition(fn func([]byte) bool) (*ByteSlice, *ByteSlice) {
 	lhs := make([][]byte, 0, c.Len())
 	rhs := make([][]byte, 0, c.Len())
 
@@ -175,12 +175,12 @@ func (c *ByteSliceCollection) Partition(fn func([]byte) bool) (*ByteSliceCollect
 		}
 	}
 
-	return NewByteSliceCollection(lhs), NewByteSliceCollection(rhs)
+	return NewByteSlice(lhs), NewByteSlice(rhs)
 }
 
 // Map calls fn for each item in the collection an replaces its value with the
 // result of fn.
-func (c *ByteSliceCollection) Map(fn func([]byte) []byte) *ByteSliceCollection {
+func (c *ByteSlice) Map(fn func([]byte) []byte) *ByteSlice {
 	for i, item := range c.items {
 		c.items[i] = fn(item)
 
@@ -192,7 +192,7 @@ func (c *ByteSliceCollection) Map(fn func([]byte) []byte) *ByteSliceCollection {
 // Reduce calls fn for each item in c and reduces the result into reducer. The
 // reducer contains the value returned by the call to fn for the previous item.
 // Reducer will be the zero []byte value on the first invocation.
-func (c *ByteSliceCollection) Reduce(fn func(reducer []byte, item []byte) []byte) []byte {
+func (c *ByteSlice) Reduce(fn func(reducer []byte, item []byte) []byte) []byte {
 	var reducer []byte
 
 	for _, item := range c.items {
@@ -206,7 +206,7 @@ func (c *ByteSliceCollection) Reduce(fn func(reducer []byte, item []byte) []byte
 // collection does not contain a matching item, Find will return the zero
 // []byte value. If you need to distinguish zero values from a condition
 // that did not match any item consider using FindOk instead.
-func (c *ByteSliceCollection) Find(fn func([]byte) bool) []byte {
+func (c *ByteSlice) Find(fn func([]byte) bool) []byte {
 	item, _ := c.FindOk(fn)
 
 	return item
@@ -216,7 +216,7 @@ func (c *ByteSliceCollection) Find(fn func([]byte) bool) []byte {
 // collection does not contain a matching item, FindOk will return the zero
 // []byte value. The second return value denotes whether the condition
 // matched any item or not.
-func (c *ByteSliceCollection) FindOk(fn func([]byte) bool) ([]byte, bool) {
+func (c *ByteSlice) FindOk(fn func([]byte) bool) ([]byte, bool) {
 	for _, item := range c.items {
 		if fn(item) {
 			return item, true
@@ -228,7 +228,7 @@ func (c *ByteSliceCollection) FindOk(fn func([]byte) bool) ([]byte, bool) {
 }
 
 // Any returns true as soon as fn evaluates to true for one item in c.
-func (c *ByteSliceCollection) Any(fn func([]byte) bool) bool {
+func (c *ByteSlice) Any(fn func([]byte) bool) bool {
 	for _, item := range c.items {
 		if fn(item) {
 			return true
@@ -239,7 +239,7 @@ func (c *ByteSliceCollection) Any(fn func([]byte) bool) bool {
 }
 
 // All returns true if fn evaluates to true for all items in c.
-func (c *ByteSliceCollection) All(fn func([]byte) bool) bool {
+func (c *ByteSlice) All(fn func([]byte) bool) bool {
 	for _, item := range c.items {
 		if !fn(item) {
 			return false
@@ -250,7 +250,7 @@ func (c *ByteSliceCollection) All(fn func([]byte) bool) bool {
 }
 
 // Contains returns true if the collection contains el.
-func (c *ByteSliceCollection) Contains(el []byte) bool {
+func (c *ByteSlice) Contains(el []byte) bool {
 	for _, item := range c.items {
 		if bytes.Equal(item, el) {
 			return true
@@ -261,25 +261,25 @@ func (c *ByteSliceCollection) Contains(el []byte) bool {
 }
 
 // Sort sorts the collection using the passed in comparator func.
-func (c *ByteSliceCollection) Sort(fn func([]byte, []byte) bool) *ByteSliceCollection {
+func (c *ByteSlice) Sort(fn func([]byte, []byte) bool) *ByteSlice {
 	sort.Slice(c.items, c.lessFunc(fn))
 	return c
 }
 
 // IsSorted returns true if the collection is sorted in the order defined by
 // the passed in comparator func.
-func (c *ByteSliceCollection) IsSorted(fn func([]byte, []byte) bool) bool {
+func (c *ByteSlice) IsSorted(fn func([]byte, []byte) bool) bool {
 	return sort.SliceIsSorted(c.items, c.lessFunc(fn))
 }
 
-func (c *ByteSliceCollection) lessFunc(fn func([]byte, []byte) bool) func(int, int) bool {
+func (c *ByteSlice) lessFunc(fn func([]byte, []byte) bool) func(int, int) bool {
 	return func(i, j int) bool {
 		return fn(c.items[i], c.items[j])
 	}
 }
 
 // Reverse reverses the order of the collection items in place and returns c.
-func (c *ByteSliceCollection) Reverse() *ByteSliceCollection {
+func (c *ByteSlice) Reverse() *ByteSlice {
 	for l, r := 0, len(c.items)-1; l < r; l, r = l+1, r-1 {
 		c.items[l], c.items[r] = c.items[r], c.items[l]
 	}
@@ -289,13 +289,13 @@ func (c *ByteSliceCollection) Reverse() *ByteSliceCollection {
 
 // Remove removes the collection item at position idx. Will panic if idx is out
 // of bounds.
-func (c *ByteSliceCollection) Remove(idx int) *ByteSliceCollection {
+func (c *ByteSlice) Remove(idx int) *ByteSlice {
 	c.items = append(c.items[:idx], c.items[idx+1:]...)
 	return c
 }
 
 // RemoveItem removes all instances of item from the collection and returns it.
-func (c *ByteSliceCollection) RemoveItem(item []byte) *ByteSliceCollection {
+func (c *ByteSlice) RemoveItem(item []byte) *ByteSlice {
 	for i, el := range c.items {
 		if bytes.Equal(el, item) {
 			c.items = append(c.items[:i], c.items[i+1:]...)
@@ -307,7 +307,7 @@ func (c *ByteSliceCollection) RemoveItem(item []byte) *ByteSliceCollection {
 
 // InsertItem inserts item into the collection at position idx. Will panic if
 // idx is out of bounds.
-func (c *ByteSliceCollection) InsertItem(item []byte, idx int) *ByteSliceCollection {
+func (c *ByteSlice) InsertItem(item []byte, idx int) *ByteSlice {
 	var zeroValue []byte
 	c.items = append(c.items, zeroValue)
 	copy(c.items[idx+1:], c.items[idx:])
@@ -317,14 +317,14 @@ func (c *ByteSliceCollection) InsertItem(item []byte, idx int) *ByteSliceCollect
 
 // Cut removes all items between index i and j from the collection and returns
 // it. Will panic if i or j is out of bounds of the underlying slice.
-func (c *ByteSliceCollection) Cut(i, j int) *ByteSliceCollection {
+func (c *ByteSlice) Cut(i, j int) *ByteSlice {
 	c.items = append(c.items[:i], c.items[j:]...)
 	return c
 }
 
 // Slice replaces the underlying slice of c with the items between i and j and
 // returns the collection. Will panic if i or j is out of bounds.
-func (c *ByteSliceCollection) Slice(i, j int) *ByteSliceCollection {
+func (c *ByteSlice) Slice(i, j int) *ByteSlice {
 	c.items = c.items[i:j]
 	return c
 }
