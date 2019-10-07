@@ -61,11 +61,11 @@ func (c *ImmutableInt64) First() int64 {
 	return c.Nth(0)
 }
 
-// FirstN returns a new collection containing the first n items. Will return
-// less than n items if the underlying slice's length is < n.
-func (c *ImmutableInt64) FirstN(n int) *ImmutableInt64 {
+// FirstN returns the first n int64 items of the collection. Will
+// return less than n items if the underlying slice's length is < n.
+func (c *ImmutableInt64) FirstN(n int) []int64 {
 	if n > c.Len() {
-		return c.Copy()
+		return c.Copy().Items()
 	}
 
 	return c.Slice(0, n)
@@ -77,11 +77,11 @@ func (c *ImmutableInt64) Last() int64 {
 	return c.Nth(c.Len() - 1)
 }
 
-// LastN returns a new collection containing the last n items. Will return less
-// than n items if the underlying slice's length is < n.
-func (c *ImmutableInt64) LastN(n int) *ImmutableInt64 {
+// LastN returns the last n int64 items of the collection. Will return
+// less than n items if the underlying slice's length is < n.
+func (c *ImmutableInt64) LastN(n int) []int64 {
 	if c.Len()-n < 0 {
-		return c.Copy()
+		return c.Copy().Items()
 	}
 
 	return c.Slice(c.Len()-n, c.Len())
@@ -340,20 +340,16 @@ func (c *ImmutableInt64) InsertItem(item int64, idx int) *ImmutableInt64 {
 	return d
 }
 
-// Cut removes all items between index i and j from the collection and returns
-// it. Will panic if i or j is out of bounds of the underlying slice.
-// The result is a new collection, the original is not modified.
-func (c *ImmutableInt64) Cut(i, j int) *ImmutableInt64 {
+// Cut returns a copy of the underlying int64 slice with the items
+// between index i and j removed. Will panic if i or j is out of bounds of the
+// underlying slice.
+func (c *ImmutableInt64) Cut(i, j int) []int64 {
 	d := c.Copy()
-	d.items = append(d.items[:i], d.items[j:]...)
-	return d
+	return append(d.items[:i], d.items[j:]...)
 }
 
-// Slice replaces the underlying slice of c with the items between i and j and
-// returns the collection. Will panic if i or j is out of bounds.
-// The result is a new collection, the original is not modified.
-func (c *ImmutableInt64) Slice(i, j int) *ImmutableInt64 {
-	d := c.Copy()
-	d.items = d.items[i:j]
-	return d
+// Slice returns the int64 items between slice index i and j. Will
+// panic if i or j is out of bounds.
+func (c *ImmutableInt64) Slice(i, j int) []int64 {
+	return c.Copy().items[i:j]
 }

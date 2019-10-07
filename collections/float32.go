@@ -61,11 +61,11 @@ func (c *Float32) First() float32 {
 	return c.Nth(0)
 }
 
-// FirstN returns a new collection containing the first n items. Will return
-// less than n items if the underlying slice's length is < n.
-func (c *Float32) FirstN(n int) *Float32 {
+// FirstN returns the first n float32 items of the collection. Will
+// return less than n items if the underlying slice's length is < n.
+func (c *Float32) FirstN(n int) []float32 {
 	if n > c.Len() {
-		return c
+		return c.Items()
 	}
 
 	return c.Slice(0, n)
@@ -77,11 +77,11 @@ func (c *Float32) Last() float32 {
 	return c.Nth(c.Len() - 1)
 }
 
-// LastN returns a new collection containing the last n items. Will return less
-// than n items if the underlying slice's length is < n.
-func (c *Float32) LastN(n int) *Float32 {
+// LastN returns the last n float32 items of the collection. Will return
+// less than n items if the underlying slice's length is < n.
+func (c *Float32) LastN(n int) []float32 {
 	if c.Len()-n < 0 {
-		return c
+		return c.Items()
 	}
 
 	return c.Slice(c.Len()-n, c.Len())
@@ -320,16 +320,17 @@ func (c *Float32) InsertItem(item float32, idx int) *Float32 {
 	return c
 }
 
-// Cut removes all items between index i and j from the collection and returns
-// it. Will panic if i or j is out of bounds of the underlying slice.
-func (c *Float32) Cut(i, j int) *Float32 {
-	c.items = append(c.items[:i], c.items[j:]...)
-	return c
+// Cut returns a copy of the underlying float32 slice with the items
+// between index i and j removed. Will panic if i or j is out of bounds of the
+// underlying slice.
+func (c *Float32) Cut(i, j int) []float32 {
+	s := make([]float32, 0, c.Cap())
+	s = append(s, c.items[:i]...)
+	return append(s, c.items[j:]...)
 }
 
-// Slice replaces the underlying slice of c with the items between i and j and
-// returns the collection. Will panic if i or j is out of bounds.
-func (c *Float32) Slice(i, j int) *Float32 {
-	c.items = c.items[i:j]
-	return c
+// Slice returns the float32 items between slice index i and j. Will
+// panic if i or j is out of bounds.
+func (c *Float32) Slice(i, j int) []float32 {
+	return c.items[i:j]
 }

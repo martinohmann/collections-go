@@ -61,11 +61,11 @@ func (c *String) First() string {
 	return c.Nth(0)
 }
 
-// FirstN returns a new collection containing the first n items. Will return
-// less than n items if the underlying slice's length is < n.
-func (c *String) FirstN(n int) *String {
+// FirstN returns the first n string items of the collection. Will
+// return less than n items if the underlying slice's length is < n.
+func (c *String) FirstN(n int) []string {
 	if n > c.Len() {
-		return c
+		return c.Items()
 	}
 
 	return c.Slice(0, n)
@@ -77,11 +77,11 @@ func (c *String) Last() string {
 	return c.Nth(c.Len() - 1)
 }
 
-// LastN returns a new collection containing the last n items. Will return less
-// than n items if the underlying slice's length is < n.
-func (c *String) LastN(n int) *String {
+// LastN returns the last n string items of the collection. Will return
+// less than n items if the underlying slice's length is < n.
+func (c *String) LastN(n int) []string {
 	if c.Len()-n < 0 {
-		return c
+		return c.Items()
 	}
 
 	return c.Slice(c.Len()-n, c.Len())
@@ -320,16 +320,17 @@ func (c *String) InsertItem(item string, idx int) *String {
 	return c
 }
 
-// Cut removes all items between index i and j from the collection and returns
-// it. Will panic if i or j is out of bounds of the underlying slice.
-func (c *String) Cut(i, j int) *String {
-	c.items = append(c.items[:i], c.items[j:]...)
-	return c
+// Cut returns a copy of the underlying string slice with the items
+// between index i and j removed. Will panic if i or j is out of bounds of the
+// underlying slice.
+func (c *String) Cut(i, j int) []string {
+	s := make([]string, 0, c.Cap())
+	s = append(s, c.items[:i]...)
+	return append(s, c.items[j:]...)
 }
 
-// Slice replaces the underlying slice of c with the items between i and j and
-// returns the collection. Will panic if i or j is out of bounds.
-func (c *String) Slice(i, j int) *String {
-	c.items = c.items[i:j]
-	return c
+// Slice returns the string items between slice index i and j. Will
+// panic if i or j is out of bounds.
+func (c *String) Slice(i, j int) []string {
+	return c.items[i:j]
 }

@@ -206,75 +206,30 @@ func TestRemove(t *testing.T) {
 func TestCut(t *testing.T) {
 	c := NewImmutable([]string{"a", "b", "c", "d"})
 
-	d := c.Cut(1, 3)
-
-	assert.Equal(t, []string{"a", "d"}, d.Items())
-
-	d = c.Cut(1, 2)
-
-	assert.Equal(t, []string{"a", "c", "d"}, d.Items())
-
-	d = c.Cut(0, c.Len())
-
-	assert.Equal(t, []string{}, d.Items())
-
-	assertDifferentItems(t, c, d)
+	assert.Equal(t, []string{"a", "d"}, c.Cut(1, 3))
+	assert.Equal(t, []string{"a", "c", "d"}, c.Cut(1, 2))
+	assert.Equal(t, []string{}, c.Cut(0, c.Len()))
 }
 
 func TestSlice(t *testing.T) {
 	c := NewImmutable([]string{"a", "b", "c", "d"})
 
-	d := c.Slice(1, 3)
-
-	assert.Equal(t, []string{"b", "c"}, d.Items())
-
-	d = c.Slice(0, c.Len())
-
-	assert.Equal(t, []string{"a", "b", "c", "d"}, d.Items())
-
-	d = c.Slice(1, 2)
-
-	assert.Equal(t, []string{"b"}, d.Items())
-
-	assertDifferentItems(t, c, d)
+	assert.Equal(t, []string{"b", "c"}, c.Slice(1, 3))
+	assert.Equal(t, []string{"a", "b", "c", "d"}, c.Slice(0, c.Len()))
+	assert.Equal(t, []string{"b"}, c.Slice(1, 2))
 }
 
 func TestFirstNLastN(t *testing.T) {
 	c := NewImmutable([]string{"a", "b", "c", "d"})
 
-	d := c.FirstN(3)
-
-	assert.Equal(t, []string{"a", "b", "c"}, d.Items())
-
-	d = c.FirstN(4)
-
-	assert.Equal(t, []string{"a", "b", "c", "d"}, d.Items())
-
-	d = c.FirstN(0)
-
-	assert.Equal(t, []string{}, d.Items())
-
-	d = c.FirstN(5)
-
-	assert.Equal(t, []string{"a", "b", "c", "d"}, d.Items())
-
-	d = c.LastN(5)
-
-	assert.Equal(t, []string{"a", "b", "c", "d"}, d.Items())
-
-	d = c.LastN(0)
-
-	assert.Equal(t, []string{}, d.Items())
-
-	d = c.LastN(4)
-
-	assert.Equal(t, []string{"a", "b", "c", "d"}, d.Items())
-
-	d = c.LastN(3)
-
-	assert.Equal(t, []string{"b", "c", "d"}, d.Items())
-
-	assertDifferentItems(t, c, d)
+	assert.Equal(t, []string{"a", "b", "c"}, c.FirstN(3))
+	assert.Equal(t, []string{"a", "b", "c", "d"}, c.FirstN(4))
+	assert.Equal(t, []string{}, c.FirstN(0))
+	assert.Equal(t, []string{"a", "b", "c", "d"}, c.FirstN(5))
+	assert.Equal(t, []string{"a", "b", "c", "d"}, c.LastN(5))
+	assert.Equal(t, []string{}, c.LastN(0))
+	assert.Equal(t, []string{"a", "b", "c", "d"}, c.LastN(4))
+	assert.Equal(t, []string{"b", "c", "d"}, c.LastN(3))
 }
 
 func TestImmutableGenericCollect(t *testing.T) {

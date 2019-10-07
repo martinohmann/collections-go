@@ -61,11 +61,11 @@ func (c *ImmutableFloat32) First() float32 {
 	return c.Nth(0)
 }
 
-// FirstN returns a new collection containing the first n items. Will return
-// less than n items if the underlying slice's length is < n.
-func (c *ImmutableFloat32) FirstN(n int) *ImmutableFloat32 {
+// FirstN returns the first n float32 items of the collection. Will
+// return less than n items if the underlying slice's length is < n.
+func (c *ImmutableFloat32) FirstN(n int) []float32 {
 	if n > c.Len() {
-		return c.Copy()
+		return c.Copy().Items()
 	}
 
 	return c.Slice(0, n)
@@ -77,11 +77,11 @@ func (c *ImmutableFloat32) Last() float32 {
 	return c.Nth(c.Len() - 1)
 }
 
-// LastN returns a new collection containing the last n items. Will return less
-// than n items if the underlying slice's length is < n.
-func (c *ImmutableFloat32) LastN(n int) *ImmutableFloat32 {
+// LastN returns the last n float32 items of the collection. Will return
+// less than n items if the underlying slice's length is < n.
+func (c *ImmutableFloat32) LastN(n int) []float32 {
 	if c.Len()-n < 0 {
-		return c.Copy()
+		return c.Copy().Items()
 	}
 
 	return c.Slice(c.Len()-n, c.Len())
@@ -340,20 +340,16 @@ func (c *ImmutableFloat32) InsertItem(item float32, idx int) *ImmutableFloat32 {
 	return d
 }
 
-// Cut removes all items between index i and j from the collection and returns
-// it. Will panic if i or j is out of bounds of the underlying slice.
-// The result is a new collection, the original is not modified.
-func (c *ImmutableFloat32) Cut(i, j int) *ImmutableFloat32 {
+// Cut returns a copy of the underlying float32 slice with the items
+// between index i and j removed. Will panic if i or j is out of bounds of the
+// underlying slice.
+func (c *ImmutableFloat32) Cut(i, j int) []float32 {
 	d := c.Copy()
-	d.items = append(d.items[:i], d.items[j:]...)
-	return d
+	return append(d.items[:i], d.items[j:]...)
 }
 
-// Slice replaces the underlying slice of c with the items between i and j and
-// returns the collection. Will panic if i or j is out of bounds.
-// The result is a new collection, the original is not modified.
-func (c *ImmutableFloat32) Slice(i, j int) *ImmutableFloat32 {
-	d := c.Copy()
-	d.items = d.items[i:j]
-	return d
+// Slice returns the float32 items between slice index i and j. Will
+// panic if i or j is out of bounds.
+func (c *ImmutableFloat32) Slice(i, j int) []float32 {
+	return c.Copy().items[i:j]
 }

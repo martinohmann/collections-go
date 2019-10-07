@@ -61,11 +61,11 @@ func (c *Byte) First() byte {
 	return c.Nth(0)
 }
 
-// FirstN returns a new collection containing the first n items. Will return
-// less than n items if the underlying slice's length is < n.
-func (c *Byte) FirstN(n int) *Byte {
+// FirstN returns the first n byte items of the collection. Will
+// return less than n items if the underlying slice's length is < n.
+func (c *Byte) FirstN(n int) []byte {
 	if n > c.Len() {
-		return c
+		return c.Items()
 	}
 
 	return c.Slice(0, n)
@@ -77,11 +77,11 @@ func (c *Byte) Last() byte {
 	return c.Nth(c.Len() - 1)
 }
 
-// LastN returns a new collection containing the last n items. Will return less
-// than n items if the underlying slice's length is < n.
-func (c *Byte) LastN(n int) *Byte {
+// LastN returns the last n byte items of the collection. Will return
+// less than n items if the underlying slice's length is < n.
+func (c *Byte) LastN(n int) []byte {
 	if c.Len()-n < 0 {
-		return c
+		return c.Items()
 	}
 
 	return c.Slice(c.Len()-n, c.Len())
@@ -320,16 +320,17 @@ func (c *Byte) InsertItem(item byte, idx int) *Byte {
 	return c
 }
 
-// Cut removes all items between index i and j from the collection and returns
-// it. Will panic if i or j is out of bounds of the underlying slice.
-func (c *Byte) Cut(i, j int) *Byte {
-	c.items = append(c.items[:i], c.items[j:]...)
-	return c
+// Cut returns a copy of the underlying byte slice with the items
+// between index i and j removed. Will panic if i or j is out of bounds of the
+// underlying slice.
+func (c *Byte) Cut(i, j int) []byte {
+	s := make([]byte, 0, c.Cap())
+	s = append(s, c.items[:i]...)
+	return append(s, c.items[j:]...)
 }
 
-// Slice replaces the underlying slice of c with the items between i and j and
-// returns the collection. Will panic if i or j is out of bounds.
-func (c *Byte) Slice(i, j int) *Byte {
-	c.items = c.items[i:j]
-	return c
+// Slice returns the byte items between slice index i and j. Will
+// panic if i or j is out of bounds.
+func (c *Byte) Slice(i, j int) []byte {
+	return c.items[i:j]
 }

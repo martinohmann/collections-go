@@ -172,7 +172,7 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				SliceType: true,
 			},
 		},
 	},
@@ -290,7 +290,7 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				SliceType: true,
 			},
 		},
 	},
@@ -407,7 +407,7 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				SliceType: true,
 			},
 		},
 	},
@@ -624,7 +624,7 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				SliceType: true,
 			},
 		},
 	},

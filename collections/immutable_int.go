@@ -61,11 +61,11 @@ func (c *ImmutableInt) First() int {
 	return c.Nth(0)
 }
 
-// FirstN returns a new collection containing the first n items. Will return
-// less than n items if the underlying slice's length is < n.
-func (c *ImmutableInt) FirstN(n int) *ImmutableInt {
+// FirstN returns the first n int items of the collection. Will
+// return less than n items if the underlying slice's length is < n.
+func (c *ImmutableInt) FirstN(n int) []int {
 	if n > c.Len() {
-		return c.Copy()
+		return c.Copy().Items()
 	}
 
 	return c.Slice(0, n)
@@ -77,11 +77,11 @@ func (c *ImmutableInt) Last() int {
 	return c.Nth(c.Len() - 1)
 }
 
-// LastN returns a new collection containing the last n items. Will return less
-// than n items if the underlying slice's length is < n.
-func (c *ImmutableInt) LastN(n int) *ImmutableInt {
+// LastN returns the last n int items of the collection. Will return
+// less than n items if the underlying slice's length is < n.
+func (c *ImmutableInt) LastN(n int) []int {
 	if c.Len()-n < 0 {
-		return c.Copy()
+		return c.Copy().Items()
 	}
 
 	return c.Slice(c.Len()-n, c.Len())
@@ -340,20 +340,16 @@ func (c *ImmutableInt) InsertItem(item int, idx int) *ImmutableInt {
 	return d
 }
 
-// Cut removes all items between index i and j from the collection and returns
-// it. Will panic if i or j is out of bounds of the underlying slice.
-// The result is a new collection, the original is not modified.
-func (c *ImmutableInt) Cut(i, j int) *ImmutableInt {
+// Cut returns a copy of the underlying int slice with the items
+// between index i and j removed. Will panic if i or j is out of bounds of the
+// underlying slice.
+func (c *ImmutableInt) Cut(i, j int) []int {
 	d := c.Copy()
-	d.items = append(d.items[:i], d.items[j:]...)
-	return d
+	return append(d.items[:i], d.items[j:]...)
 }
 
-// Slice replaces the underlying slice of c with the items between i and j and
-// returns the collection. Will panic if i or j is out of bounds.
-// The result is a new collection, the original is not modified.
-func (c *ImmutableInt) Slice(i, j int) *ImmutableInt {
-	d := c.Copy()
-	d.items = d.items[i:j]
-	return d
+// Slice returns the int items between slice index i and j. Will
+// panic if i or j is out of bounds.
+func (c *ImmutableInt) Slice(i, j int) []int {
+	return c.Copy().items[i:j]
 }

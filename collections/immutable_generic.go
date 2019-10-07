@@ -118,11 +118,11 @@ func (c *ImmutableGeneric) First() interface{} {
 	return c.Nth(0)
 }
 
-// FirstN returns a new collection containing the first n items. Will return
-// less than n items if the underlying slice's length is < n.
-func (c *ImmutableGeneric) FirstN(n int) *ImmutableGeneric {
+// FirstN returns the first n items of the collection. Will
+// return less than n items if the underlying slice's length is < n.
+func (c *ImmutableGeneric) FirstN(n int) interface{} {
 	if n > c.Len() {
-		return c.Copy()
+		return c.Copy().Items()
 	}
 
 	return c.Slice(0, n)
@@ -134,11 +134,11 @@ func (c *ImmutableGeneric) Last() interface{} {
 	return c.Nth(c.Len() - 1)
 }
 
-// LastN returns a new collection containing the last n items. Will return less
-// than n items if the underlying slice's length is < n.
-func (c *ImmutableGeneric) LastN(n int) *ImmutableGeneric {
+// LastN returns the last n string items of the collection. Will return
+// less than n items if the underlying slice's length is < n.
+func (c *ImmutableGeneric) LastN(n int) interface{} {
 	if c.Len()-n < 0 {
-		return c.Copy()
+		return c.Copy().Items()
 	}
 
 	return c.Slice(c.Len()-n, c.Len())
@@ -406,20 +406,16 @@ func (c *ImmutableGeneric) InsertItem(item interface{}, idx int) *ImmutableGener
 	return newImmutableGeneric(c.sliceType, s, s.Interface())
 }
 
-// Cut removes all items between index i and j from the collection and returns
-// it. Will panic if i or j is out of bounds of the underlying slice.
-// The result is a new collection, the original is not modified.
-func (c *ImmutableGeneric) Cut(i, j int) *ImmutableGeneric {
+// Cut returns a copy of the underlying string slice with the items
+// between index i and j removed. Will panic if i or j is out of bounds of the
+// underlying slice.
+func (c *ImmutableGeneric) Cut(i, j int) interface{} {
 	s := c.copySlice()
-	s = reflect.AppendSlice(s.Slice(0, i), s.Slice(j, s.Len()))
-	return newImmutableGeneric(c.sliceType, s, s.Interface())
+	return reflect.AppendSlice(s.Slice(0, i), s.Slice(j, s.Len())).Interface()
 }
 
-// Slice replaces the underlying slice of c with the items between i and j and
-// returns the collection. Will panic if i or j is out of bounds.
-// The result is a new collection, the original is not modified.
-func (c *ImmutableGeneric) Slice(i, j int) *ImmutableGeneric {
-	s := c.copySlice()
-	s = c.rval.Slice(i, j)
-	return newImmutableGeneric(c.sliceType, s, s.Interface())
+// Slice returns the items between slice index i and j. Will
+// panic if i or j is out of bounds.
+func (c *ImmutableGeneric) Slice(i, j int) interface{} {
+	return c.copySlice().Slice(i, j).Interface()
 }

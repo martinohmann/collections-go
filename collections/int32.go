@@ -61,11 +61,11 @@ func (c *Int32) First() int32 {
 	return c.Nth(0)
 }
 
-// FirstN returns a new collection containing the first n items. Will return
-// less than n items if the underlying slice's length is < n.
-func (c *Int32) FirstN(n int) *Int32 {
+// FirstN returns the first n int32 items of the collection. Will
+// return less than n items if the underlying slice's length is < n.
+func (c *Int32) FirstN(n int) []int32 {
 	if n > c.Len() {
-		return c
+		return c.Items()
 	}
 
 	return c.Slice(0, n)
@@ -77,11 +77,11 @@ func (c *Int32) Last() int32 {
 	return c.Nth(c.Len() - 1)
 }
 
-// LastN returns a new collection containing the last n items. Will return less
-// than n items if the underlying slice's length is < n.
-func (c *Int32) LastN(n int) *Int32 {
+// LastN returns the last n int32 items of the collection. Will return
+// less than n items if the underlying slice's length is < n.
+func (c *Int32) LastN(n int) []int32 {
 	if c.Len()-n < 0 {
-		return c
+		return c.Items()
 	}
 
 	return c.Slice(c.Len()-n, c.Len())
@@ -320,16 +320,17 @@ func (c *Int32) InsertItem(item int32, idx int) *Int32 {
 	return c
 }
 
-// Cut removes all items between index i and j from the collection and returns
-// it. Will panic if i or j is out of bounds of the underlying slice.
-func (c *Int32) Cut(i, j int) *Int32 {
-	c.items = append(c.items[:i], c.items[j:]...)
-	return c
+// Cut returns a copy of the underlying int32 slice with the items
+// between index i and j removed. Will panic if i or j is out of bounds of the
+// underlying slice.
+func (c *Int32) Cut(i, j int) []int32 {
+	s := make([]int32, 0, c.Cap())
+	s = append(s, c.items[:i]...)
+	return append(s, c.items[j:]...)
 }
 
-// Slice replaces the underlying slice of c with the items between i and j and
-// returns the collection. Will panic if i or j is out of bounds.
-func (c *Int32) Slice(i, j int) *Int32 {
-	c.items = c.items[i:j]
-	return c
+// Slice returns the int32 items between slice index i and j. Will
+// panic if i or j is out of bounds.
+func (c *Int32) Slice(i, j int) []int32 {
+	return c.items[i:j]
 }

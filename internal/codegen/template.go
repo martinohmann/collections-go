@@ -68,14 +68,14 @@ func (c *{{.Name}}) First() {{.ItemType}} {
 	return c.Nth(0)
 }
 
-// FirstN returns a new collection containing the first n items. Will return
-// less than n items if the underlying slice's length is < n.
-func (c *{{.Name}}) FirstN(n int) *{{.Name}} {
+// FirstN returns the first n {{.ItemType}} items of the collection. Will
+// return less than n items if the underlying slice's length is < n.
+func (c *{{.Name}}) FirstN(n int) []{{.ItemType}} {
 	if n > c.Len() {
 {{ if .Immutable -}}
-        return c.Copy()
+        return c.Copy().Items()
 {{- else -}}
-		return c
+		return c.Items()
 {{- end }}
 	}
 
@@ -88,14 +88,14 @@ func (c *{{.Name}}) Last() {{.ItemType}} {
 	return c.Nth(c.Len() - 1)
 }
 
-// LastN returns a new collection containing the last n items. Will return less
-// than n items if the underlying slice's length is < n.
-func (c *{{.Name}}) LastN(n int) *{{.Name}} {
+// LastN returns the last n {{.ItemType}} items of the collection. Will return
+// less than n items if the underlying slice's length is < n.
+func (c *{{.Name}}) LastN(n int) []{{.ItemType}} {
 	if c.Len()-n < 0 {
 {{ if .Immutable -}}
-        return c.Copy()
+        return c.Copy().Items()
 {{- else -}}
-		return c
+		return c.Items()
 {{- end }}
 	}
 
@@ -456,35 +456,27 @@ func (c *{{.Name}}) InsertItem(item {{.ItemType}}, idx int) *{{.Name}} {
 {{ end -}}
 }
 
-// Cut removes all items between index i and j from the collection and returns
-// it. Will panic if i or j is out of bounds of the underlying slice.
-{{- if .Immutable }}
-// The result is a new collection, the original is not modified.
-{{- end }}
-func (c *{{.Name}}) Cut(i, j int) *{{.Name}} {
+// Cut returns a copy of the underlying {{.ItemType}} slice with the items
+// between index i and j removed. Will panic if i or j is out of bounds of the
+// underlying slice.
+func (c *{{.Name}}) Cut(i, j int) []{{.ItemType}} {
 {{ if .Immutable -}}
 	d := c.Copy()
-	d.items = append(d.items[:i], d.items[j:]...)
-	return d
+	return append(d.items[:i], d.items[j:]...)
 {{ else -}}
-	c.items = append(c.items[:i], c.items[j:]...)
-	return c
+	s := make([]{{.ItemType}}, 0, c.Cap())
+	s = append(s, c.items[:i]...)
+	return append(s, c.items[j:]...)
 {{ end -}}
 }
 
-// Slice replaces the underlying slice of c with the items between i and j and
-// returns the collection. Will panic if i or j is out of bounds.
-{{- if .Immutable }}
-// The result is a new collection, the original is not modified.
-{{- end }}
-func (c *{{.Name}}) Slice(i, j int) *{{.Name}} {
+// Slice returns the {{.ItemType}} items between slice index i and j. Will
+// panic if i or j is out of bounds.
+func (c *{{.Name}}) Slice(i, j int) []{{.ItemType}} {
 {{ if .Immutable -}}
-	d := c.Copy()
-	d.items = d.items[i:j]
-	return d
+	return c.Copy().items[i:j]
 {{ else -}}
-	c.items = c.items[i:j]
-	return c
+	return c.items[i:j]
 {{ end -}}
 }
 `

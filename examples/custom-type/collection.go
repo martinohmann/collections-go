@@ -61,11 +61,11 @@ func (c *Collection) First() *Type {
 	return c.Nth(0)
 }
 
-// FirstN returns a new collection containing the first n items. Will return
-// less than n items if the underlying slice's length is < n.
-func (c *Collection) FirstN(n int) *Collection {
+// FirstN returns the first n *Type items of the collection. Will
+// return less than n items if the underlying slice's length is < n.
+func (c *Collection) FirstN(n int) []*Type {
 	if n > c.Len() {
-		return c
+		return c.Items()
 	}
 
 	return c.Slice(0, n)
@@ -77,11 +77,11 @@ func (c *Collection) Last() *Type {
 	return c.Nth(c.Len() - 1)
 }
 
-// LastN returns a new collection containing the last n items. Will return less
-// than n items if the underlying slice's length is < n.
-func (c *Collection) LastN(n int) *Collection {
+// LastN returns the last n *Type items of the collection. Will return
+// less than n items if the underlying slice's length is < n.
+func (c *Collection) LastN(n int) []*Type {
 	if c.Len()-n < 0 {
-		return c
+		return c.Items()
 	}
 
 	return c.Slice(c.Len()-n, c.Len())
@@ -320,16 +320,17 @@ func (c *Collection) InsertItem(item *Type, idx int) *Collection {
 	return c
 }
 
-// Cut removes all items between index i and j from the collection and returns
-// it. Will panic if i or j is out of bounds of the underlying slice.
-func (c *Collection) Cut(i, j int) *Collection {
-	c.items = append(c.items[:i], c.items[j:]...)
-	return c
+// Cut returns a copy of the underlying *Type slice with the items
+// between index i and j removed. Will panic if i or j is out of bounds of the
+// underlying slice.
+func (c *Collection) Cut(i, j int) []*Type {
+	s := make([]*Type, 0, c.Cap())
+	s = append(s, c.items[:i]...)
+	return append(s, c.items[j:]...)
 }
 
-// Slice replaces the underlying slice of c with the items between i and j and
-// returns the collection. Will panic if i or j is out of bounds.
-func (c *Collection) Slice(i, j int) *Collection {
-	c.items = c.items[i:j]
-	return c
+// Slice returns the *Type items between slice index i and j. Will
+// panic if i or j is out of bounds.
+func (c *Collection) Slice(i, j int) []*Type {
+	return c.items[i:j]
 }
