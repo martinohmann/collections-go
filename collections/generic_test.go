@@ -9,17 +9,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewImmutablePanic(t *testing.T) {
+func TestNewPanic(t *testing.T) {
 	defer func() {
 		r := recover()
 
 		assert.NotNil(t, r)
 	}()
 
-	NewImmutable(nil)
+	New(nil)
 }
 
-func TestNewSafeImmutableGeneric(t *testing.T) {
+func TestNewSafeGeneric(t *testing.T) {
 	tests := []struct {
 		name        string
 		input       interface{}
@@ -28,7 +28,7 @@ func TestNewSafeImmutableGeneric(t *testing.T) {
 		{
 			name:        "nil",
 			input:       nil,
-			expectedErr: errors.New("cannot create *ImmutableGeneric for nil interface{}"),
+			expectedErr: errors.New("cannot create *Generic for nil interface{}"),
 		},
 		{
 			name:        "primitive type",
@@ -75,7 +75,7 @@ func TestNewSafeImmutableGeneric(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			c, err := SafeNewImmutable(test.input)
+			c, err := SafeNew(test.input)
 
 			if test.expectedErr != nil {
 				require.Error(t, err)
@@ -88,8 +88,8 @@ func TestNewSafeImmutableGeneric(t *testing.T) {
 	}
 }
 
-func TestImmutableGenericMethodChain(t *testing.T) {
-	c := NewImmutable([]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
+func TestGenericMethodChain(t *testing.T) {
+	c := New([]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
 
 	d := c.Copy()
 
@@ -109,14 +109,14 @@ func TestImmutableGenericMethodChain(t *testing.T) {
 		t.Fatalf("expected: %+v, got: %+v", expected, result)
 	}
 
-	assertEqualItems(t, c, d)
+	assertDifferentItems(t, c, d)
 }
 
-func TestImmutableGenericEach(t *testing.T) {
+func TestGenericEach(t *testing.T) {
 	input := []int{1, 5, 3}
 	actual := make([]int, 0)
 
-	c := NewImmutable(input)
+	c := New(input)
 
 	c.Each(func(val interface{}) {
 		actual = append(actual, val.(int))
@@ -125,11 +125,11 @@ func TestImmutableGenericEach(t *testing.T) {
 	assert.Equal(t, input, actual)
 }
 
-func TestImmutableGenericEachIndex(t *testing.T) {
+func TestGenericEachIndex(t *testing.T) {
 	input := []int{1, 5, 3}
 	actual := make([]int, 0)
 
-	c := NewImmutable(input)
+	c := New(input)
 
 	c.EachIndex(func(val interface{}, idx int) {
 		actual = append(actual, val.(int)+idx)
@@ -138,8 +138,8 @@ func TestImmutableGenericEachIndex(t *testing.T) {
 	assert.Equal(t, []int{1, 6, 5}, actual)
 }
 
-func TestImmutableGenericIndexOf(t *testing.T) {
-	c := NewImmutable([]string{"d", "b", "z"})
+func TestGenericIndexOf(t *testing.T) {
+	c := New([]string{"d", "b", "z"})
 
 	assert.Equal(t, -1, c.IndexOf("a"))
 	assert.Equal(t, 0, c.IndexOf("d"))
@@ -147,8 +147,8 @@ func TestImmutableGenericIndexOf(t *testing.T) {
 	assert.Equal(t, -1, c.IndexOf(42))
 }
 
-func TestImmutableGenericNth(t *testing.T) {
-	c := NewImmutable([]string{"d", "b", "z"})
+func TestGenericNth(t *testing.T) {
+	c := New([]string{"d", "b", "z"})
 
 	assert.Equal(t, "d", c.First())
 
@@ -157,8 +157,8 @@ func TestImmutableGenericNth(t *testing.T) {
 	assert.Equal(t, "b", c.Get(1))
 }
 
-func TestInsertItem(t *testing.T) {
-	c := NewImmutable([]string{"a", "c"})
+func TestGenericInsertItem(t *testing.T) {
+	c := New([]string{"a", "c"})
 
 	d := c.InsertItem("b", 1)
 
@@ -166,27 +166,23 @@ func TestInsertItem(t *testing.T) {
 
 	d = c.InsertItem("b", 0)
 
-	assert.Equal(t, []string{"b", "a", "c"}, d.Items())
+	assert.Equal(t, []string{"b", "a", "b", "c"}, d.Items())
 
-	d = c.InsertItem("b", 2)
-
-	assert.Equal(t, []string{"a", "c", "b"}, d.Items())
-
-	assertDifferentItems(t, c, d)
+	assertEqualItems(t, c, d)
 }
 
-func TestRemoveItem(t *testing.T) {
-	c := NewImmutable([]string{"a", "b", "c", "d"})
+func TestGenericRemoveItem(t *testing.T) {
+	c := New([]string{"a", "b", "c", "d"})
 
 	d := c.RemoveItem("b")
 
 	assert.Equal(t, []string{"a", "c", "d"}, d.Items())
 
-	assertDifferentItems(t, c, d)
+	assertEqualItems(t, c, d)
 }
 
-func TestRemove(t *testing.T) {
-	c := NewImmutable([]string{"a", "b", "c", "d"})
+func TestGenericRemove(t *testing.T) {
+	c := New([]string{"a", "b", "c", "d"})
 
 	d := c.Remove(3)
 
@@ -194,33 +190,33 @@ func TestRemove(t *testing.T) {
 
 	d = c.Remove(0)
 
-	assert.Equal(t, []string{"b", "c", "d"}, d.Items())
+	assert.Equal(t, []string{"b", "c"}, d.Items())
 
-	d = c.Remove(2)
+	d = c.Remove(1)
 
-	assert.Equal(t, []string{"a", "b", "d"}, d.Items())
+	assert.Equal(t, []string{"b"}, d.Items())
 
-	assertDifferentItems(t, c, d)
+	assertEqualItems(t, c, d)
 }
 
-func TestCut(t *testing.T) {
-	c := NewImmutable([]string{"a", "b", "c", "d"})
+func TestGenericCut(t *testing.T) {
+	c := New([]string{"a", "b", "c", "d"})
 
 	assert.Equal(t, []string{"a", "d"}, c.Cut(1, 3))
 	assert.Equal(t, []string{"a", "c", "d"}, c.Cut(1, 2))
 	assert.Equal(t, []string{}, c.Cut(0, c.Len()))
 }
 
-func TestSlice(t *testing.T) {
-	c := NewImmutable([]string{"a", "b", "c", "d"})
+func TestGenericSlice(t *testing.T) {
+	c := New([]string{"a", "b", "c", "d"})
 
 	assert.Equal(t, []string{"b", "c"}, c.Slice(1, 3))
 	assert.Equal(t, []string{"a", "b", "c", "d"}, c.Slice(0, c.Len()))
 	assert.Equal(t, []string{"b"}, c.Slice(1, 2))
 }
 
-func TestFirstNLastN(t *testing.T) {
-	c := NewImmutable([]string{"a", "b", "c", "d"})
+func TestGenericFirstNLastN(t *testing.T) {
+	c := New([]string{"a", "b", "c", "d"})
 
 	assert.Equal(t, []string{"a", "b", "c"}, c.FirstN(3))
 	assert.Equal(t, []string{"a", "b", "c", "d"}, c.FirstN(4))
@@ -232,7 +228,7 @@ func TestFirstNLastN(t *testing.T) {
 	assert.Equal(t, []string{"b", "c", "d"}, c.LastN(3))
 }
 
-func TestImmutableGenericCollect(t *testing.T) {
+func TestGenericCollect(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    interface{}
@@ -259,18 +255,18 @@ func TestImmutableGenericCollect(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			c := NewImmutable(test.input)
+			c := New(test.input)
 			d := c.Collect(test.fn)
 			if !reflect.DeepEqual(test.expected, d.Items()) {
 				t.Fatalf("expected: %+v, got: %+v", test.expected, d.Items())
 			}
 
-			assertDifferentItems(t, c, d)
+			assertEqualItems(t, c, d)
 		})
 	}
 }
 
-func TestImmutableGenericReject(t *testing.T) {
+func TestGenericReject(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    interface{}
@@ -297,18 +293,18 @@ func TestImmutableGenericReject(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			c := NewImmutable(test.input)
+			c := New(test.input)
 			d := c.Reject(test.fn)
 			if !reflect.DeepEqual(test.expected, d.Items()) {
 				t.Fatalf("expected: %+v, got: %+v", test.expected, d.Items())
 			}
 
-			assertDifferentItems(t, c, d)
+			assertEqualItems(t, c, d)
 		})
 	}
 }
 
-func TestImmutableGenericPartition(t *testing.T) {
+func TestGenericPartition(t *testing.T) {
 	tests := []struct {
 		name        string
 		input       interface{}
@@ -338,7 +334,7 @@ func TestImmutableGenericPartition(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			c := NewImmutable(test.input)
+			c := New(test.input)
 			d := c.Copy()
 			lhs, rhs := c.Partition(test.fn)
 			if !reflect.DeepEqual(test.expectedLHS, lhs.Items()) {
@@ -354,12 +350,7 @@ func TestImmutableGenericPartition(t *testing.T) {
 	}
 }
 
-type FooType struct {
-	Bar int
-	Baz string
-}
-
-func TestImmutableGenericMap(t *testing.T) {
+func TestGenericMap(t *testing.T) {
 	tests := []struct {
 		name        string
 		input       interface{}
@@ -370,7 +361,7 @@ func TestImmutableGenericMap(t *testing.T) {
 		{
 			name:        "nil",
 			input:       nil,
-			expectedErr: errors.New("cannot create *ImmutableGeneric for nil interface{}"),
+			expectedErr: errors.New("cannot create *Generic for nil interface{}"),
 		},
 		{
 			name:  "strings",
@@ -412,7 +403,7 @@ func TestImmutableGenericMap(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			c, err := SafeNewImmutable(test.input)
+			c, err := SafeNew(test.input)
 
 			if test.expectedErr != nil {
 				require.Error(t, err)
@@ -429,7 +420,7 @@ func TestImmutableGenericMap(t *testing.T) {
 	}
 }
 
-func TestImmutableGenericFindOk(t *testing.T) {
+func TestGenericFindOk(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    interface{}
@@ -467,7 +458,7 @@ func TestImmutableGenericFindOk(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			actual, found := NewImmutable(test.input).FindOk(test.fn)
+			actual, found := New(test.input).FindOk(test.fn)
 			require.Equal(t, test.found, found)
 			if found {
 				assert.Equal(t, test.expected, actual)
@@ -476,7 +467,7 @@ func TestImmutableGenericFindOk(t *testing.T) {
 	}
 }
 
-func TestImmutableGenericAny(t *testing.T) {
+func TestGenericAny(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    interface{}
@@ -511,13 +502,13 @@ func TestImmutableGenericAny(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			actual := NewImmutable(test.input).Any(test.fn)
+			actual := New(test.input).Any(test.fn)
 			assert.Equal(t, test.expected, actual)
 		})
 	}
 }
 
-func TestImmutableGenericAll(t *testing.T) {
+func TestGenericAll(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    interface{}
@@ -552,13 +543,13 @@ func TestImmutableGenericAll(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			actual := NewImmutable(test.input).All(test.fn)
+			actual := New(test.input).All(test.fn)
 			assert.Equal(t, test.expected, actual)
 		})
 	}
 }
 
-func TestImmutableGenericContains(t *testing.T) {
+func TestGenericContains(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    interface{}
@@ -587,23 +578,23 @@ func TestImmutableGenericContains(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			actual := NewImmutable(test.input).Contains(test.val)
+			actual := New(test.input).Contains(test.val)
 			assert.Equal(t, test.expected, actual)
 		})
 	}
 }
 
-func TestImmutableGenericLenCap(t *testing.T) {
+func TestGenericLenCap(t *testing.T) {
 	s := make([]int, 1, 3)
 
-	c := NewImmutable(s)
+	c := New(s)
 
 	assert.Equal(t, 1, c.Len())
 	assert.Equal(t, 3, c.Cap())
 }
 
-func TestImmutableGenericAppend(t *testing.T) {
-	actual := NewImmutable([]int{1, 2, 3}).Append([]interface{}{4, 5}...)
+func TestGenericAppend(t *testing.T) {
+	actual := New([]int{1, 2, 3}).Append([]interface{}{4, 5}...)
 	expected := []int{1, 2, 3, 4, 5}
 
 	if !reflect.DeepEqual(expected, actual.Items()) {
@@ -611,8 +602,8 @@ func TestImmutableGenericAppend(t *testing.T) {
 	}
 }
 
-func TestImmutableGenericPrepend(t *testing.T) {
-	actual := NewImmutable([]int{1, 2, 3}).Prepend([]interface{}{4, 5}...)
+func TestGenericPrepend(t *testing.T) {
+	actual := New([]int{1, 2, 3}).Prepend([]interface{}{4, 5}...)
 	expected := []int{4, 5, 1, 2, 3}
 
 	if !reflect.DeepEqual(expected, actual.Items()) {
@@ -620,8 +611,8 @@ func TestImmutableGenericPrepend(t *testing.T) {
 	}
 }
 
-func TestCopy(t *testing.T) {
-	c1 := NewImmutable([]int{1, 2, 3})
+func TestGenericCopy(t *testing.T) {
+	c1 := New([]int{1, 2, 3})
 	c2 := c1.Copy()
 
 	assertEqualItems(t, c1, c2)
@@ -631,7 +622,7 @@ func TestCopy(t *testing.T) {
 	assertDifferentItems(t, c1, c2)
 }
 
-func TestImmutableGenericSort(t *testing.T) {
+func TestGenericSort(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    interface{}
@@ -666,23 +657,23 @@ func TestImmutableGenericSort(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			c := NewImmutable(test.input)
+			c := New(test.input)
 			d := c.Sort(test.sortFunc)
 			if !reflect.DeepEqual(test.expected, d.Items()) {
 				t.Fatalf("expected: %+v, got: %+v", test.expected, d.Items())
 			}
 
-			assertDifferentItems(t, c, d)
+			assertEqualItems(t, c, d)
 		})
 	}
 }
 
-func TestIsSorted(t *testing.T) {
+func TestGenericIsSorted(t *testing.T) {
 	sortInts := func(a interface{}, b interface{}) bool {
 		return a.(int) < b.(int)
 	}
 
-	c := NewImmutable([]int{5, 1, 4})
+	c := New([]int{5, 1, 4})
 
 	assert.False(t, c.IsSorted(sortInts))
 
@@ -690,10 +681,10 @@ func TestIsSorted(t *testing.T) {
 
 	assert.True(t, d.IsSorted(sortInts))
 
-	assertDifferentItems(t, c, d)
+	assertEqualItems(t, c, d)
 }
 
-func TestImmutableGenericReverse(t *testing.T) {
+func TestGenericReverse(t *testing.T) {
 	tests := []struct {
 		name     string
 		input    interface{}
@@ -713,25 +704,13 @@ func TestImmutableGenericReverse(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			c := NewImmutable(test.input)
+			c := New(test.input)
 			d := c.Reverse()
 			if !reflect.DeepEqual(test.expected, d.Items()) {
 				t.Fatalf("expected: %+v, got: %+v", test.expected, d.Items())
 			}
 
-			assertDifferentItems(t, c, d)
+			assertEqualItems(t, c, d)
 		})
-	}
-}
-
-func assertEqualItems(t *testing.T, c1, c2 Interface) {
-	if !reflect.DeepEqual(c1.Interface(), c2.Interface()) {
-		t.Fatalf("collections have different items, c1: %+v, c2: %+v", c1.Interface(), c2.Interface())
-	}
-}
-
-func assertDifferentItems(t *testing.T, c1, c2 Interface) {
-	if reflect.DeepEqual(c1.Interface(), c2.Interface()) {
-		t.Fatalf("collections have same items: %+v", c1.Interface())
 	}
 }

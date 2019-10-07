@@ -13,10 +13,8 @@ import (
 // use of reflection to access the underlying slice which is very slow.
 type Generic struct {
 	sliceType reflect.Type
-	elemType  reflect.Type
 	zeroValue interface{}
 	rval      reflect.Value
-	items     interface{}
 }
 
 // New creates a new generalized immutable collection from items. Will
@@ -43,20 +41,17 @@ func SafeNew(items interface{}) (*Generic, error) {
 
 	switch t.Kind() {
 	case reflect.Slice:
-		return newGeneric(t, reflect.ValueOf(items), items), nil
+		return newGeneric(t, reflect.ValueOf(items)), nil
 	default:
 		return nil, errors.Errorf("expected slice type, got %T", items)
 	}
 }
 
-func newGeneric(t reflect.Type, rval reflect.Value, items interface{}) *Generic {
-	elemType := t.Elem()
+func newGeneric(t reflect.Type, rval reflect.Value) *Generic {
 	return &Generic{
-		items:     items,
 		rval:      rval,
 		sliceType: t,
-		elemType:  elemType,
-		zeroValue: reflect.Zero(elemType).Interface(),
+		zeroValue: reflect.Zero(t.Elem()).Interface(),
 	}
 }
 
@@ -77,12 +72,12 @@ func (c *Generic) valueAt(idx int) interface{} {
 // Interface returns the underlying slice used by the collection as interface{}
 // value.
 func (c *Generic) Interface() interface{} {
-	return c.items
+	return c.rval.Interface()
 }
 
 // Items returns the underlying slice used by the collection.
 func (c *Generic) Items() interface{} {
-	return c.items
+	return c.rval.Interface()
 }
 
 // EachIndex calls fn for every item in the collection. The slice index of the
@@ -192,7 +187,7 @@ func (c *Generic) Prepend(items ...interface{}) *Generic {
 	}
 
 	for i := 0; i < s.Len(); i++ {
-		c.rval.Index(n).Set(s.Index(i))
+		c.rval.Index(n + i).Set(s.Index(i))
 	}
 
 	return c
@@ -201,7 +196,7 @@ func (c *Generic) Prepend(items ...interface{}) *Generic {
 // Copy creates a copy of the collection and the underlying slice.
 func (c *Generic) Copy() *Generic {
 	s := c.copySlice()
-	return newGeneric(c.sliceType, s, s.Interface())
+	return newGeneric(c.sliceType, s)
 }
 
 // Filter collects all items for which fn evaluates to true into a new
@@ -252,8 +247,7 @@ func (c *Generic) Partition(fn func(interface{}) bool) (*Generic, *Generic) {
 		}
 	}
 
-	return newGeneric(c.sliceType, lhs, lhs.Interface()),
-		newGeneric(c.sliceType, rhs, rhs.Interface())
+	return newGeneric(c.sliceType, lhs), newGeneric(c.sliceType, rhs)
 }
 
 // Map calls fn for each item in the collection an replaces its value with the
@@ -343,14 +337,14 @@ func (c *Generic) Contains(el interface{}) bool {
 
 // Sort sorts the collection using the passed in comparator func.
 func (c *Generic) Sort(fn func(interface{}, interface{}) bool) *Generic {
-	sort.Slice(c.items, c.lessFunc(fn))
+	sort.Slice(c.rval.Interface(), c.lessFunc(fn))
 	return c
 }
 
 // IsSorted returns true if the collection is sorted in the order defined by
 // the passed in comparator func.
 func (c *Generic) IsSorted(fn func(interface{}, interface{}) bool) bool {
-	return sort.SliceIsSorted(c.items, c.lessFunc(fn))
+	return sort.SliceIsSorted(c.rval.Interface(), c.lessFunc(fn))
 }
 
 func (c *Generic) lessFunc(fn func(interface{}, interface{}) bool) func(int, int) bool {
@@ -363,9 +357,9 @@ func (c *Generic) lessFunc(fn func(interface{}, interface{}) bool) func(int, int
 // reversed.
 func (c *Generic) Reverse() *Generic {
 	for l, r := 0, c.Len()-1; l < r; l, r = l+1, r-1 {
-		tmp := c.rval.Index(l)
+		v := c.rval.Index(l).Interface()
 		c.rval.Index(l).Set(c.rval.Index(r))
-		c.rval.Index(r).Set(tmp)
+		c.rval.Index(r).Set(reflect.ValueOf(v))
 	}
 
 	return c
@@ -402,7 +396,10 @@ func (c *Generic) InsertItem(item interface{}, idx int) *Generic {
 // between index i and j removed. Will panic if i or j is out of bounds of the
 // underlying slice.
 func (c *Generic) Cut(i, j int) interface{} {
-	return reflect.AppendSlice(c.rval.Slice(0, i), c.rval.Slice(j, c.rval.Len())).Interface()
+	s := c.makeSlice()
+	s = reflect.AppendSlice(s, c.rval.Slice(0, i))
+	s = reflect.AppendSlice(s, c.rval.Slice(j, c.rval.Len()))
+	return s.Interface()
 }
 
 // Slice returns the items between slice index i and j. Will
