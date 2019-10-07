@@ -262,4 +262,8 @@ func TestStringSlice(t *testing.T) {
 	assert.Equal(t, []string{"b", "c"}, c.Slice(1, 3))
 
 	assert.Equal(t, []string{"a", "b", "c", "d", "e"}, c.Items())
+
+	c.Slice(1, 3)[0] = "a"
+
+	assert.Equal(t, []string{"a", "a", "c", "d", "e"}, c.Items())
 }
