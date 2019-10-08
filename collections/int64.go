@@ -186,8 +186,16 @@ func (c *Int64) Partition(fn func(int64) bool) (*Int64, *Int64) {
 // Map calls fn for each item in the collection an replaces its value with the
 // result of fn.
 func (c *Int64) Map(fn func(int64) int64) *Int64 {
+	return c.MapIndex(func(item int64, _ int) int64 {
+		return fn(item)
+	})
+}
+
+// MapIndex calls fn for each item in the collection an replaces its value with the
+// result of fn.
+func (c *Int64) MapIndex(fn func(int64, int) int64) *Int64 {
 	for i, item := range c.items {
-		c.items[i] = fn(item)
+		c.items[i] = fn(item, i)
 
 	}
 

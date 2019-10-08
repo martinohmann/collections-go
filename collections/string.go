@@ -186,8 +186,16 @@ func (c *String) Partition(fn func(string) bool) (*String, *String) {
 // Map calls fn for each item in the collection an replaces its value with the
 // result of fn.
 func (c *String) Map(fn func(string) string) *String {
+	return c.MapIndex(func(item string, _ int) string {
+		return fn(item)
+	})
+}
+
+// MapIndex calls fn for each item in the collection an replaces its value with the
+// result of fn.
+func (c *String) MapIndex(fn func(string, int) string) *String {
 	for i, item := range c.items {
-		c.items[i] = fn(item)
+		c.items[i] = fn(item, i)
 
 	}
 

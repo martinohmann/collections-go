@@ -192,10 +192,19 @@ func (c *ImmutableInt64) Partition(fn func(int64) bool) (*ImmutableInt64, *Immut
 // result of fn. The result is a new collection. The original
 // collection is not modified.
 func (c *ImmutableInt64) Map(fn func(int64) int64) *ImmutableInt64 {
+	return c.MapIndex(func(item int64, _ int) int64 {
+		return fn(item)
+	})
+}
+
+// MapIndex calls fn for each item in the collection an replaces its value with the
+// result of fn. The result is a new collection. The original
+// collection is not modified.
+func (c *ImmutableInt64) MapIndex(fn func(int64, int) int64) *ImmutableInt64 {
 	d := c.Copy()
 
 	for i, item := range d.items {
-		d.items[i] = fn(item)
+		d.items[i] = fn(item, i)
 
 	}
 

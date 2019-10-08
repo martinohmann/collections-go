@@ -193,10 +193,19 @@ func (c *ImmutableByteSlice) Partition(fn func([]byte) bool) (*ImmutableByteSlic
 // result of fn. The result is a new collection. The original
 // collection is not modified.
 func (c *ImmutableByteSlice) Map(fn func([]byte) []byte) *ImmutableByteSlice {
+	return c.MapIndex(func(item []byte, _ int) []byte {
+		return fn(item)
+	})
+}
+
+// MapIndex calls fn for each item in the collection an replaces its value with the
+// result of fn. The result is a new collection. The original
+// collection is not modified.
+func (c *ImmutableByteSlice) MapIndex(fn func([]byte, int) []byte) *ImmutableByteSlice {
 	d := c.Copy()
 
 	for i, item := range d.items {
-		d.items[i] = fn(item)
+		d.items[i] = fn(item, i)
 
 	}
 

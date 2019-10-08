@@ -90,8 +90,8 @@ func (c *ImmutableGeneric) EachIndex(fn func(interface{}, int)) {
 
 // Each calls fn for every item in the collection.
 func (c *ImmutableGeneric) Each(fn func(interface{})) {
-	c.EachIndex(func(val interface{}, _ int) {
-		fn(val)
+	c.EachIndex(func(item interface{}, _ int) {
+		fn(item)
 	})
 }
 
@@ -249,10 +249,20 @@ func (c *ImmutableGeneric) Partition(fn func(interface{}) bool) (*ImmutableGener
 // modified. Will panic if the value returned by fn is not of the slices
 // element type.
 func (c *ImmutableGeneric) Map(fn func(interface{}) interface{}) *ImmutableGeneric {
+	return c.MapIndex(func(item interface{}, _ int) interface{} {
+		return fn(item)
+	})
+}
+
+// MapIndex calls fn for each item in the collection an replaces its value with the
+// result of fn. The result is a new collection. The original collection is not
+// modified. Will panic if the value returned by fn is not of the slices
+// element type.
+func (c *ImmutableGeneric) MapIndex(fn func(interface{}, int) interface{}) *ImmutableGeneric {
 	s := c.makeSlice()
 
 	for i := 0; i < c.Len(); i++ {
-		s = reflect.Append(s, reflect.ValueOf(fn(c.valueAt(i))))
+		s = reflect.Append(s, reflect.ValueOf(fn(c.valueAt(i), i)))
 	}
 
 	return newImmutableGeneric(c.sliceType, s)

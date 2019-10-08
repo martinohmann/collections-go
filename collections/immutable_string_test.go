@@ -1,6 +1,7 @@
 package collections
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -129,6 +130,21 @@ func TestImmutableStringMap(t *testing.T) {
 	}
 
 	assert.Equal(t, []string{"aa", "bb", "cc"}, d.Items())
+	assert.Equal(t, []string{"a", "b", "c"}, c.Items())
+}
+
+func TestImmutableStringMapIndex(t *testing.T) {
+	c := NewImmutableString([]string{"a", "b", "c"})
+
+	d := c.MapIndex(func(item string, i int) string {
+		return fmt.Sprintf("%s%d", item, i)
+	})
+
+	if c == d {
+		t.Fatal("expected pointers to be different")
+	}
+
+	assert.Equal(t, []string{"a0", "b1", "c2"}, d.Items())
 	assert.Equal(t, []string{"a", "b", "c"}, c.Items())
 }
 

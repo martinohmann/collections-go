@@ -450,6 +450,36 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
+	"MapIndex": Signature{
+		In: []Parameter{
+			{
+				CollectionType: true,
+			},
+			{
+				Kind: reflect.Func,
+				FuncSignature: Signature{
+					In: []Parameter{
+						{
+							ElementType: true,
+						},
+						{
+							Kind: reflect.Int,
+						},
+					},
+					Out: []Parameter{
+						{
+							ElementType: true,
+						},
+					},
+				},
+			},
+		},
+		Out: []Parameter{
+			{
+				CollectionType: true,
+			},
+		},
+	},
 	"Nth": Signature{
 		In: []Parameter{
 			{

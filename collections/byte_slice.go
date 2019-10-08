@@ -187,8 +187,16 @@ func (c *ByteSlice) Partition(fn func([]byte) bool) (*ByteSlice, *ByteSlice) {
 // Map calls fn for each item in the collection an replaces its value with the
 // result of fn.
 func (c *ByteSlice) Map(fn func([]byte) []byte) *ByteSlice {
+	return c.MapIndex(func(item []byte, _ int) []byte {
+		return fn(item)
+	})
+}
+
+// MapIndex calls fn for each item in the collection an replaces its value with the
+// result of fn.
+func (c *ByteSlice) MapIndex(fn func([]byte, int) []byte) *ByteSlice {
 	for i, item := range c.items {
-		c.items[i] = fn(item)
+		c.items[i] = fn(item, i)
 
 	}
 

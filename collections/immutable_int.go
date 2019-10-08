@@ -192,10 +192,19 @@ func (c *ImmutableInt) Partition(fn func(int) bool) (*ImmutableInt, *ImmutableIn
 // result of fn. The result is a new collection. The original
 // collection is not modified.
 func (c *ImmutableInt) Map(fn func(int) int) *ImmutableInt {
+	return c.MapIndex(func(item int, _ int) int {
+		return fn(item)
+	})
+}
+
+// MapIndex calls fn for each item in the collection an replaces its value with the
+// result of fn. The result is a new collection. The original
+// collection is not modified.
+func (c *ImmutableInt) MapIndex(fn func(int, int) int) *ImmutableInt {
 	d := c.Copy()
 
 	for i, item := range d.items {
-		d.items[i] = fn(item)
+		d.items[i] = fn(item, i)
 
 	}
 

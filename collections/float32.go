@@ -186,8 +186,16 @@ func (c *Float32) Partition(fn func(float32) bool) (*Float32, *Float32) {
 // Map calls fn for each item in the collection an replaces its value with the
 // result of fn.
 func (c *Float32) Map(fn func(float32) float32) *Float32 {
+	return c.MapIndex(func(item float32, _ int) float32 {
+		return fn(item)
+	})
+}
+
+// MapIndex calls fn for each item in the collection an replaces its value with the
+// result of fn.
+func (c *Float32) MapIndex(fn func(float32, int) float32) *Float32 {
 	for i, item := range c.items {
-		c.items[i] = fn(item)
+		c.items[i] = fn(item, i)
 
 	}
 

@@ -1,6 +1,7 @@
 package collections
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -126,6 +127,20 @@ func TestStringMap(t *testing.T) {
 	}
 
 	assert.Equal(t, []string{"aa", "bb", "cc"}, c.Items())
+}
+
+func TestStringMapIndex(t *testing.T) {
+	c := NewString([]string{"a", "b", "c"})
+
+	d := c.MapIndex(func(item string, i int) string {
+		return fmt.Sprintf("%s%d", item, i)
+	})
+
+	if c != d {
+		t.Fatal("expected pointers to be the same")
+	}
+
+	assert.Equal(t, []string{"a0", "b1", "c2"}, c.Items())
 }
 
 func TestStringReduce(t *testing.T) {

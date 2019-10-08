@@ -30,8 +30,7 @@ func New(items interface{}) *Generic {
 }
 
 // SafeNew creates a new generalized immutable collection from items.
-// Will return an error if items is not a slice type. Consider using
-// SafeNew instead.
+// Will return an error if items is not a slice type.
 func SafeNew(items interface{}) (*Generic, error) {
 	if items == nil {
 		return nil, errors.Errorf("cannot create *Generic for nil interface{}")
@@ -90,8 +89,8 @@ func (c *Generic) EachIndex(fn func(interface{}, int)) {
 
 // Each calls fn for every item in the collection.
 func (c *Generic) Each(fn func(interface{})) {
-	c.EachIndex(func(val interface{}, _ int) {
-		fn(val)
+	c.EachIndex(func(item interface{}, _ int) {
+		fn(item)
 	})
 }
 
@@ -251,11 +250,20 @@ func (c *Generic) Partition(fn func(interface{}) bool) (*Generic, *Generic) {
 }
 
 // Map calls fn for each item in the collection an replaces its value with the
-// result of fn. The result is a new collection. Will panic if the value
-// returned by fn is not of the slices element type.
+// result of fn. Will panic if the value returned by fn is not of the slices
+// element type.
 func (c *Generic) Map(fn func(interface{}) interface{}) *Generic {
+	return c.MapIndex(func(item interface{}, _ int) interface{} {
+		return fn(item)
+	})
+}
+
+// MapIndex calls fn for each item in the collection an replaces its value with
+// the result of fn. Will panic if the value returned by fn is not of the
+// slices element type.
+func (c *Generic) MapIndex(fn func(interface{}, int) interface{}) *Generic {
 	for i := 0; i < c.Len(); i++ {
-		c.items.Index(i).Set(reflect.ValueOf(fn(c.valueAt(i))))
+		c.items.Index(i).Set(reflect.ValueOf(fn(c.valueAt(i), i)))
 	}
 
 	return c

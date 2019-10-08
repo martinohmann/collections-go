@@ -2,6 +2,7 @@ package collections
 
 import (
 	"errors"
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -418,6 +419,20 @@ func TestGenericMap(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGenericMapIndex(t *testing.T) {
+	c := New([]string{"a", "b", "c"})
+
+	d := c.MapIndex(func(item interface{}, i int) interface{} {
+		return fmt.Sprintf("%s%d", item.(string), i)
+	})
+
+	if c != d {
+		t.Fatal("expected pointers to be the same")
+	}
+
+	assert.Equal(t, []string{"a0", "b1", "c2"}, c.Items())
 }
 
 func TestGenericFindOk(t *testing.T) {

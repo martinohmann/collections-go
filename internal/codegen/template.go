@@ -252,18 +252,27 @@ func (c *{{.Name}}) Partition(fn func({{.ItemType}}) bool) (*{{.Name}}, *{{.Name
 // result of fn.{{if .Immutable}} The result is a new collection. The original
 // collection is not modified.{{end}}
 func (c *{{.Name}}) Map(fn func({{.ItemType}}) {{.ItemType}}) *{{.Name}} {
+	return c.MapIndex(func(item {{.ItemType}}, _ int) {{.ItemType}} {
+		return fn(item)
+	})
+}
+
+// MapIndex calls fn for each item in the collection an replaces its value with the
+// result of fn.{{if .Immutable}} The result is a new collection. The original
+// collection is not modified.{{end}}
+func (c *{{.Name}}) MapIndex(fn func({{.ItemType}}, int) {{.ItemType}}) *{{.Name}} {
 {{ if .Immutable -}}
 	d := c.Copy()
 
 	for i, item := range d.items {
-		d.items[i] = fn(item)
+		d.items[i] = fn(item, i)
 
 	}
 
 	return d
 {{ else -}}
 	for i, item := range c.items {
-		c.items[i] = fn(item)
+		c.items[i] = fn(item, i)
 
 	}
 

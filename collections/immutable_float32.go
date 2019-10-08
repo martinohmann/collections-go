@@ -192,10 +192,19 @@ func (c *ImmutableFloat32) Partition(fn func(float32) bool) (*ImmutableFloat32, 
 // result of fn. The result is a new collection. The original
 // collection is not modified.
 func (c *ImmutableFloat32) Map(fn func(float32) float32) *ImmutableFloat32 {
+	return c.MapIndex(func(item float32, _ int) float32 {
+		return fn(item)
+	})
+}
+
+// MapIndex calls fn for each item in the collection an replaces its value with the
+// result of fn. The result is a new collection. The original
+// collection is not modified.
+func (c *ImmutableFloat32) MapIndex(fn func(float32, int) float32) *ImmutableFloat32 {
 	d := c.Copy()
 
 	for i, item := range d.items {
-		d.items[i] = fn(item)
+		d.items[i] = fn(item, i)
 
 	}
 
