@@ -3,7 +3,7 @@ package collections
 import (
 	"errors"
 	"fmt"
-	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -89,336 +89,125 @@ func TestNewSafeGeneric(t *testing.T) {
 	}
 }
 
-func TestGenericMethodChain(t *testing.T) {
-	c := New([]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
+func TestGenericInterface(t *testing.T) {
+	c := New([]string{"a"})
 
-	d := c.Copy()
-
-	result := c.Map(func(val interface{}) interface{} {
-		return val.(int) * 3
-	}).Reject(func(val interface{}) bool {
-		return val.(int)%2 == 0
-	}).Collect(func(val interface{}) bool {
-		return val.(int) > 10
-	}).Reduce(func(r interface{}, val interface{}) interface{} {
-		return r.(int) + val.(int)
-	})
-
-	expected := 63
-
-	if !reflect.DeepEqual(expected, result) {
-		t.Fatalf("expected: %+v, got: %+v", expected, result)
-	}
-
-	assertDifferentItems(t, c, d)
+	assert.Equal(t, c.Interface(), c.Items())
 }
 
 func TestGenericEach(t *testing.T) {
-	input := []int{1, 5, 3}
-	actual := make([]int, 0)
+	expected := []string{"a", "b", "c"}
 
-	c := New(input)
+	c := New(expected)
 
-	c.Each(func(val interface{}) {
-		actual = append(actual, val.(int))
+	result := make([]string, 0)
+
+	c.Each(func(item interface{}) {
+		result = append(result, item.(string))
 	})
 
-	assert.Equal(t, input, actual)
-}
-
-func TestGenericEachIndex(t *testing.T) {
-	input := []int{1, 5, 3}
-	actual := make([]int, 0)
-
-	c := New(input)
-
-	c.EachIndex(func(val interface{}, idx int) {
-		actual = append(actual, val.(int)+idx)
-	})
-
-	assert.Equal(t, []int{1, 6, 5}, actual)
+	assert.Equal(t, expected, result)
 }
 
 func TestGenericIndexOf(t *testing.T) {
-	c := New([]string{"d", "b", "z"})
+	c := New([]string{"a", "b", "c"})
 
-	assert.Equal(t, -1, c.IndexOf("a"))
-	assert.Equal(t, 0, c.IndexOf("d"))
-	assert.Equal(t, 2, c.IndexOf("z"))
-	assert.Equal(t, -1, c.IndexOf(42))
+	assert.Equal(t, 2, c.IndexOf("c"))
+	assert.Equal(t, -1, c.IndexOf("d"))
 }
 
-func TestGenericNth(t *testing.T) {
-	c := New([]string{"d", "b", "z"})
+func TestGenericGet(t *testing.T) {
+	c := New([]string{"a", "b", "c"})
 
-	assert.Equal(t, "d", c.First())
-
-	assert.Equal(t, "z", c.Last())
-
+	assert.Equal(t, "a", c.First())
 	assert.Equal(t, "b", c.Get(1))
+	assert.Equal(t, "c", c.Last())
+
+	assert.Equal(t, []string{"a", "b"}, c.FirstN(2))
+	assert.Equal(t, []string{"a", "b", "c"}, c.FirstN(4))
+	assert.Equal(t, []string{"b", "c"}, c.LastN(2))
+	assert.Equal(t, []string{"a", "b", "c"}, c.LastN(4))
 }
 
-func TestGenericInsertItem(t *testing.T) {
-	c := New([]string{"a", "c"})
+func TestGenericAppend(t *testing.T) {
+	c := New([]string{"a", "b", "c"})
 
-	d := c.InsertItem("b", 1)
+	d := c.Append("d").Append([]interface{}{"e", "f"}...)
 
-	assert.Equal(t, []string{"a", "b", "c"}, d.Items())
-
-	d = c.InsertItem("b", 0)
-
-	assert.Equal(t, []string{"b", "a", "b", "c"}, d.Items())
-
-	assertEqualItems(t, c, d)
-}
-
-func TestGenericRemoveItem(t *testing.T) {
-	c := New([]string{"a", "b", "c", "d"})
-
-	d := c.RemoveItem("b")
-
-	assert.Equal(t, []string{"a", "c", "d"}, d.Items())
-
-	assertEqualItems(t, c, d)
-}
-
-func TestGenericRemove(t *testing.T) {
-	c := New([]string{"a", "b", "c", "d"})
-
-	d := c.Remove(3)
-
-	assert.Equal(t, []string{"a", "b", "c"}, d.Items())
-
-	d = c.Remove(0)
-
-	assert.Equal(t, []string{"b", "c"}, d.Items())
-
-	d = c.Remove(1)
-
-	assert.Equal(t, []string{"b"}, d.Items())
-
-	assertEqualItems(t, c, d)
-}
-
-func TestGenericCut(t *testing.T) {
-	c := New([]string{"a", "b", "c", "d"})
-
-	assert.Equal(t, []string{"a", "d"}, c.Cut(1, 3))
-	assert.Equal(t, []string{"a", "c", "d"}, c.Cut(1, 2))
-	assert.Equal(t, []string{}, c.Cut(0, c.Len()))
-}
-
-func TestGenericSlice(t *testing.T) {
-	c := New([]string{"a", "b", "c", "d"})
-
-	assert.Equal(t, []string{"b", "c"}, c.Slice(1, 3))
-	assert.Equal(t, []string{"a", "b", "c", "d"}, c.Slice(0, c.Len()))
-	assert.Equal(t, []string{"b"}, c.Slice(1, 2))
-}
-
-func TestGenericFirstNLastN(t *testing.T) {
-	c := New([]string{"a", "b", "c", "d"})
-
-	assert.Equal(t, []string{"a", "b", "c"}, c.FirstN(3))
-	assert.Equal(t, []string{"a", "b", "c", "d"}, c.FirstN(4))
-	assert.Equal(t, []string{}, c.FirstN(0))
-	assert.Equal(t, []string{"a", "b", "c", "d"}, c.FirstN(5))
-	assert.Equal(t, []string{"a", "b", "c", "d"}, c.LastN(5))
-	assert.Equal(t, []string{}, c.LastN(0))
-	assert.Equal(t, []string{"a", "b", "c", "d"}, c.LastN(4))
-	assert.Equal(t, []string{"b", "c", "d"}, c.LastN(3))
-}
-
-func TestGenericCollect(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    interface{}
-		fn       func(interface{}) bool
-		expected interface{}
-	}{
-		{
-			name:  "strings",
-			input: []string{"a", "b", "c", "d", "e"},
-			fn: func(v interface{}) bool {
-				return v.(string) < "c"
-			},
-			expected: []string{"a", "b"},
-		},
-		{
-			name:  "ints",
-			input: []int{1, 2, 3, 4, 5},
-			fn: func(v interface{}) bool {
-				return v.(int)%2 == 0
-			},
-			expected: []int{2, 4},
-		},
+	if c != d {
+		t.Fatal("expected pointers to be the same")
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			c := New(test.input)
-			d := c.Collect(test.fn)
-			if !reflect.DeepEqual(test.expected, d.Items()) {
-				t.Fatalf("expected: %+v, got: %+v", test.expected, d.Items())
-			}
-
-			assertEqualItems(t, c, d)
-		})
-	}
+	assert.Equal(t, []string{"a", "b", "c", "d", "e", "f"}, c.Items())
 }
 
-func TestGenericReject(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    interface{}
-		fn       func(interface{}) bool
-		expected interface{}
-	}{
-		{
-			name:  "strings",
-			input: []string{"a", "b", "c", "d", "e"},
-			fn: func(v interface{}) bool {
-				return v.(string) < "c"
-			},
-			expected: []string{"c", "d", "e"},
-		},
-		{
-			name:  "ints",
-			input: []int{1, 2, 3, 4, 5},
-			fn: func(v interface{}) bool {
-				return v.(int)%2 == 0
-			},
-			expected: []int{1, 3, 5},
-		},
+func TestGenericPrepend(t *testing.T) {
+	c := New([]string{"a", "b", "c"})
+
+	d := c.Prepend("d").Prepend([]interface{}{"e", "f"}...)
+
+	if c != d {
+		t.Fatal("expected pointers to be the same")
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			c := New(test.input)
-			d := c.Reject(test.fn)
-			if !reflect.DeepEqual(test.expected, d.Items()) {
-				t.Fatalf("expected: %+v, got: %+v", test.expected, d.Items())
-			}
+	assert.Equal(t, []string{"e", "f", "d", "a", "b", "c"}, c.Items())
+}
 
-			assertEqualItems(t, c, d)
-		})
+func TestGenericCopy(t *testing.T) {
+	c := New([]string{"a", "b", "c"})
+
+	d := c.Copy()
+
+	if c == d {
+		t.Fatal("expected pointers to be different")
 	}
+
+	assert.Equal(t, c.Items(), d.Items())
+}
+
+func TestGenericCollectReject(t *testing.T) {
+	c := New([]string{"foo", "foobar", "baz"})
+
+	d := c.Collect(func(item interface{}) bool {
+		return strings.HasPrefix(item.(string), "foo")
+	}).Reject(func(item interface{}) bool {
+		return item.(string) == "foo"
+	})
+
+	if c != d {
+		t.Fatal("expected pointers to be the same")
+	}
+
+	assert.Equal(t, []string{"foobar"}, c.Items())
 }
 
 func TestGenericPartition(t *testing.T) {
-	tests := []struct {
-		name        string
-		input       interface{}
-		fn          func(interface{}) bool
-		expectedLHS interface{}
-		expectedRHS interface{}
-	}{
-		{
-			name:  "strings",
-			input: []string{"a", "b", "c", "d", "e"},
-			fn: func(v interface{}) bool {
-				return v.(string) < "c"
-			},
-			expectedLHS: []string{"a", "b"},
-			expectedRHS: []string{"c", "d", "e"},
-		},
-		{
-			name:  "ints",
-			input: []int{1, 2, 3, 4, 5},
-			fn: func(v interface{}) bool {
-				return v.(int)%2 == 0
-			},
-			expectedLHS: []int{2, 4},
-			expectedRHS: []int{1, 3, 5},
-		},
+	c := New([]string{"bar", "foo", "foobar", "baz"})
+
+	d, e := c.Partition(func(item interface{}) bool {
+		return strings.HasPrefix(item.(string), "foo")
+	})
+
+	if c == d || c == e {
+		t.Fatal("expected pointers to be different")
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			c := New(test.input)
-			d := c.Copy()
-			lhs, rhs := c.Partition(test.fn)
-			if !reflect.DeepEqual(test.expectedLHS, lhs.Items()) {
-				t.Fatalf("expected: %+v, got: %+v", test.expectedLHS, lhs.Items())
-			}
-
-			if !reflect.DeepEqual(test.expectedRHS, rhs.Items()) {
-				t.Fatalf("expected: %+v, got: %+v", test.expectedRHS, rhs.Items())
-			}
-
-			assertEqualItems(t, c, d)
-		})
-	}
+	assert.Equal(t, []string{"foo", "foobar"}, d.Items())
+	assert.Equal(t, []string{"bar", "baz"}, e.Items())
 }
 
 func TestGenericMap(t *testing.T) {
-	tests := []struct {
-		name        string
-		input       interface{}
-		fn          func(interface{}) interface{}
-		expected    interface{}
-		expectedErr error
-	}{
-		{
-			name:        "nil",
-			input:       nil,
-			expectedErr: errors.New("cannot create *Generic for nil interface{}"),
-		},
-		{
-			name:  "strings",
-			input: []string{"a", "b", "c", "d", "e"},
-			fn: func(v interface{}) interface{} {
-				return v.(string) + "1"
-			},
-			expected: []string{"a1", "b1", "c1", "d1", "e1"},
-		},
-		{
-			name:  "ints",
-			input: []int{1, 2, 3, 4, 5},
-			fn: func(v interface{}) interface{} {
-				return v.(int) * 2
-			},
-			expected: []int{2, 4, 6, 8, 10},
-		},
-		{
-			name: "FooType",
-			input: []FooType{
-				{Bar: 1, Baz: "a"},
-				{Bar: 2, Baz: "b"},
-				{Bar: 3, Baz: "c"},
-			},
-			fn: func(v interface{}) interface{} {
-				foo := v.(FooType)
+	c := New([]string{"a", "b", "c"})
 
-				foo.Bar++
+	d := c.Map(func(item interface{}) interface{} {
+		return item.(string) + item.(string)
+	})
 
-				return foo
-			},
-			expected: []FooType{
-				{Bar: 2, Baz: "a"},
-				{Bar: 3, Baz: "b"},
-				{Bar: 4, Baz: "c"},
-			},
-		},
+	if c != d {
+		t.Fatal("expected pointers to be the same")
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			c, err := SafeNew(test.input)
-
-			if test.expectedErr != nil {
-				require.Error(t, err)
-				assert.Equal(t, test.expectedErr.Error(), err.Error())
-			} else {
-				require.NoError(t, err)
-				c = c.Map(test.fn)
-
-				if !reflect.DeepEqual(test.expected, c.Items()) {
-					t.Fatalf("expected: %+v, got: %+v", test.expected, c.Items())
-				}
-			}
-		})
-	}
+	assert.Equal(t, []string{"aa", "bb", "cc"}, c.Items())
 }
 
 func TestGenericMapIndex(t *testing.T) {
@@ -435,297 +224,142 @@ func TestGenericMapIndex(t *testing.T) {
 	assert.Equal(t, []string{"a0", "b1", "c2"}, c.Items())
 }
 
-func TestGenericFindOk(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    interface{}
-		fn       func(interface{}) bool
-		expected interface{}
-		found    bool
-	}{
-		{
-			name:  "strings",
-			input: []string{"a", "b", "c", "d", "e"},
-			fn: func(v interface{}) bool {
-				return v.(string) < "c"
-			},
-			expected: "a",
-			found:    true,
-		},
-		{
-			name:  "ints",
-			input: []int{1, 2, 3, 4, 5},
-			fn: func(v interface{}) bool {
-				return v.(int)%2 == 0
-			},
-			expected: 2,
-			found:    true,
-		},
-		{
-			name:  "ints #2",
-			input: []int{1, 2, 3, 4, 5},
-			fn: func(v interface{}) bool {
-				return v.(int) > 5
-			},
-			expected: false,
-		},
-	}
+func TestGenericReduce(t *testing.T) {
+	c := New([]string{"a", "b", "c"})
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			actual, found := New(test.input).FindOk(test.fn)
-			require.Equal(t, test.found, found)
-			if found {
-				assert.Equal(t, test.expected, actual)
-			}
-		})
-	}
+	result := c.Reduce(func(reducer, item interface{}) interface{} {
+		return reducer.(string) + item.(string)
+	})
+
+	assert.Equal(t, "abc", result)
 }
 
-func TestGenericAny(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    interface{}
-		fn       func(interface{}) bool
-		expected bool
-	}{
-		{
-			name:  "strings",
-			input: []string{"a", "b", "c", "d", "e"},
-			fn: func(v interface{}) bool {
-				return v.(string) < "c"
-			},
-			expected: true,
-		},
-		{
-			name:  "ints",
-			input: []int{1, 2, 3, 4, 5},
-			fn: func(v interface{}) bool {
-				return v.(int)%2 == 0
-			},
-			expected: true,
-		},
-		{
-			name:  "ints #2",
-			input: []int{1, 2, 3, 4, 5},
-			fn: func(v interface{}) bool {
-				return v.(int) > 5
-			},
-			expected: false,
-		},
-	}
+func TestGenericFind(t *testing.T) {
+	c := New([]string{"aa", "bb", "cc"})
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			actual := New(test.input).Any(test.fn)
-			assert.Equal(t, test.expected, actual)
-		})
-	}
+	result := c.Find(func(item interface{}) bool {
+		return strings.HasPrefix(item.(string), "c")
+	})
+
+	assert.Equal(t, "cc", result)
+
+	_, ok := c.FindOk(func(item interface{}) bool {
+		return strings.HasPrefix(item.(string), "d")
+	})
+	assert.False(t, ok)
 }
 
-func TestGenericAll(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    interface{}
-		fn       func(interface{}) bool
-		expected bool
-	}{
-		{
-			name:  "strings",
-			input: []string{"a", "b", "c", "d", "e"},
-			fn: func(v interface{}) bool {
-				return v.(string) < "c"
-			},
-			expected: false,
-		},
-		{
-			name:  "ints",
-			input: []int{1, 2, 3, 4, 5},
-			fn: func(v interface{}) bool {
-				return v.(int)%2 == 0
-			},
-			expected: false,
-		},
-		{
-			name:  "ints #2",
-			input: []int{1, 2, 3, 4, 5},
-			fn: func(v interface{}) bool {
-				return v.(int) < 10
-			},
-			expected: true,
-		},
+func TestGenericAnyAll(t *testing.T) {
+	c := New([]string{"foo", "foobar", "foobarbaz"})
+
+	hasFooPrefix := func(item interface{}) bool {
+		return strings.HasPrefix(item.(string), "foo")
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			actual := New(test.input).All(test.fn)
-			assert.Equal(t, test.expected, actual)
-		})
+	hasBarPrefix := func(item interface{}) bool {
+		return strings.HasPrefix(item.(string), "bar")
 	}
+
+	hasBarSuffix := func(item interface{}) bool {
+		return strings.HasSuffix(item.(string), "bar")
+	}
+
+	assert.True(t, c.Any(hasFooPrefix))
+	assert.True(t, c.Any(hasBarSuffix))
+	assert.False(t, c.Any(hasBarPrefix))
+
+	assert.True(t, c.All(hasFooPrefix))
+	assert.False(t, c.All(hasBarSuffix))
+	assert.False(t, c.All(hasBarPrefix))
 }
 
 func TestGenericContains(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    interface{}
-		val      interface{}
-		expected bool
-	}{
-		{
-			name:     "strings",
-			input:    []string{"a", "b", "c", "d", "e"},
-			val:      "a",
-			expected: true,
-		},
-		{
-			name:     "ints",
-			input:    []int{1, 2, 3, 4, 5},
-			val:      5,
-			expected: true,
-		},
-		{
-			name:     "ints #2",
-			input:    []int{1, 2, 3, 4, 5},
-			val:      "a",
-			expected: false,
-		},
-	}
+	c := New([]string{"a", "b"})
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			actual := New(test.input).Contains(test.val)
-			assert.Equal(t, test.expected, actual)
-		})
-	}
-}
-
-func TestGenericLenCap(t *testing.T) {
-	s := make([]int, 1, 3)
-
-	c := New(s)
-
-	assert.Equal(t, 1, c.Len())
-	assert.Equal(t, 3, c.Cap())
-}
-
-func TestGenericAppend(t *testing.T) {
-	actual := New([]int{1, 2, 3}).Append([]interface{}{4, 5}...)
-	expected := []int{1, 2, 3, 4, 5}
-
-	if !reflect.DeepEqual(expected, actual.Items()) {
-		t.Fatalf("expected %+v, got %+v", expected, actual.Items())
-	}
-}
-
-func TestGenericPrepend(t *testing.T) {
-	actual := New([]int{1, 2, 3}).Prepend([]interface{}{4, 5}...)
-	expected := []int{4, 5, 1, 2, 3}
-
-	if !reflect.DeepEqual(expected, actual.Items()) {
-		t.Fatalf("expected %+v, got %+v", expected, actual.Items())
-	}
-}
-
-func TestGenericCopy(t *testing.T) {
-	c1 := New([]int{1, 2, 3})
-	c2 := c1.Copy()
-
-	assertEqualItems(t, c1, c2)
-
-	c1 = c1.Append(4)
-
-	assertDifferentItems(t, c1, c2)
+	assert.True(t, c.Contains("a"))
+	assert.False(t, c.Contains("c"))
 }
 
 func TestGenericSort(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    interface{}
-		sortFunc func(interface{}, interface{}) bool
-		expected interface{}
-	}{
-		{
-			name:  "strings",
-			input: []string{"b", "a", "d", "c", "e"},
-			sortFunc: func(a interface{}, b interface{}) bool {
-				return a.(string) > b.(string)
-			},
-			expected: []string{"e", "d", "c", "b", "a"},
-		},
-		{
-			name:  "ints desc",
-			input: []int{3, 1, 5, 2, 4},
-			sortFunc: func(a interface{}, b interface{}) bool {
-				return a.(int) > b.(int)
-			},
-			expected: []int{5, 4, 3, 2, 1},
-		},
-		{
-			name:  "FooType by Baz",
-			input: []FooType{{Baz: "123"}, {Baz: "xyz"}, {Baz: "asdf"}},
-			sortFunc: func(a interface{}, b interface{}) bool {
-				return a.(FooType).Baz < b.(FooType).Baz
-			},
-			expected: []FooType{{Baz: "123"}, {Baz: "asdf"}, {Baz: "xyz"}},
-		},
+	c := New([]string{"z", "b", "y", "a"})
+
+	sortFunc := func(a, b interface{}) bool {
+		return a.(string) < b.(string)
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			c := New(test.input)
-			d := c.Sort(test.sortFunc)
-			if !reflect.DeepEqual(test.expected, d.Items()) {
-				t.Fatalf("expected: %+v, got: %+v", test.expected, d.Items())
-			}
+	d := c.Sort(sortFunc)
 
-			assertEqualItems(t, c, d)
-		})
-	}
-}
-
-func TestGenericIsSorted(t *testing.T) {
-	sortInts := func(a interface{}, b interface{}) bool {
-		return a.(int) < b.(int)
+	if c != d {
+		t.Fatal("expected pointers to be the same")
 	}
 
-	c := New([]int{5, 1, 4})
-
-	assert.False(t, c.IsSorted(sortInts))
-
-	d := c.Sort(sortInts)
-
-	assert.True(t, d.IsSorted(sortInts))
-
-	assertEqualItems(t, c, d)
+	assert.True(t, c.IsSorted(sortFunc))
+	assert.Equal(t, []string{"a", "b", "y", "z"}, c.Items())
 }
 
 func TestGenericReverse(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    interface{}
-		expected interface{}
-	}{
-		{
-			name:     "strings",
-			input:    []string{"a", "b", "c", "d", "e"},
-			expected: []string{"e", "d", "c", "b", "a"},
-		},
-		{
-			name:     "ints",
-			input:    []int{1, 2, 3, 4, 5},
-			expected: []int{5, 4, 3, 2, 1},
-		},
+	c := New([]string{"a", "b", "c"})
+
+	d := c.Reverse()
+
+	if c != d {
+		t.Fatal("expected pointers to be the same")
 	}
 
-	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
-			c := New(test.input)
-			d := c.Reverse()
-			if !reflect.DeepEqual(test.expected, d.Items()) {
-				t.Fatalf("expected: %+v, got: %+v", test.expected, d.Items())
-			}
+	assert.Equal(t, []string{"c", "b", "a"}, c.Items())
+}
 
-			assertEqualItems(t, c, d)
-		})
+func TestGenericRemove(t *testing.T) {
+	c := New([]string{"a", "b", "c", "d"})
+
+	d := c.Remove(1)
+
+	if c != d {
+		t.Fatal("expected pointers to be the same")
 	}
+
+	assert.Equal(t, []string{"a", "c", "d"}, c.Items())
+	assert.Equal(t, []string{"a", "c"}, c.Remove(c.Len()-1).Items())
+
+	d = c.RemoveItem("c")
+
+	if c != d {
+		t.Fatal("expected pointers to be the same")
+	}
+
+	assert.Equal(t, []string{"a"}, c.Items())
+}
+
+func TestGenericInsertItem(t *testing.T) {
+	c := New([]string{"a", "b"})
+
+	d := c.InsertItem("c", 1)
+
+	if c != d {
+		t.Fatal("expected pointers to be the same")
+	}
+
+	assert.Equal(t, []string{"a", "c", "b"}, c.Items())
+	assert.Equal(t, []string{"d", "a", "c", "b"}, c.InsertItem("d", 0).Items())
+	assert.Equal(t, []string{"d", "a", "c", "b", "e"}, c.InsertItem("e", c.Len()).Items())
+}
+
+func TestGenericCut(t *testing.T) {
+	c := New([]string{"a", "b", "c", "d", "e"})
+
+	assert.Equal(t, []string{"a", "c", "d", "e"}, c.Cut(1, 2))
+
+	assert.Equal(t, []string{"a", "b", "c", "d", "e"}, c.Items())
+}
+
+func TestGenericSlice(t *testing.T) {
+	c := New([]string{"a", "b", "c", "d", "e"})
+
+	assert.Equal(t, []string{"b", "c"}, c.Slice(1, 3))
+
+	assert.Equal(t, []string{"a", "b", "c", "d", "e"}, c.Items())
+
+	c.Slice(1, 3).([]string)[0] = "a"
+
+	assert.Equal(t, []string{"a", "a", "c", "d", "e"}, c.Items())
 }
