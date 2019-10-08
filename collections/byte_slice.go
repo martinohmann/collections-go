@@ -88,16 +88,16 @@ func (c *ByteSlice) LastN(n int) [][]byte {
 	return c.Slice(c.Len()-n, c.Len())
 }
 
-// Get returns the item at idx from the collection. Will panic if the
-// underlying slice is shorter than idx+1.
-func (c *ByteSlice) Get(idx int) []byte {
-	return c.Nth(idx)
+// Get returns the item at pos from the collection. Will panic if the
+// underlying slice is shorter than pos+1.
+func (c *ByteSlice) Get(pos int) []byte {
+	return c.Nth(pos)
 }
 
 // Nth returns the nth item from the collection. Will panic if the underlying
-// slice is shorter than idx+1.
-func (c *ByteSlice) Nth(idx int) []byte {
-	return c.items[idx]
+// slice is shorter than pos+1.
+func (c *ByteSlice) Nth(pos int) []byte {
+	return c.items[pos]
 }
 
 // Len returns the length of the underlying []byte slice.
@@ -293,10 +293,10 @@ func (c *ByteSlice) Reverse() *ByteSlice {
 	return c
 }
 
-// Remove removes the collection item at position idx. Will panic if idx is out
+// Remove removes the collection item at position pos. Will panic if pos is out
 // of bounds.
-func (c *ByteSlice) Remove(idx int) *ByteSlice {
-	c.items = append(c.items[:idx], c.items[idx+1:]...)
+func (c *ByteSlice) Remove(pos int) *ByteSlice {
+	c.items = append(c.items[:pos], c.items[pos+1:]...)
 	return c
 }
 
@@ -311,13 +311,13 @@ func (c *ByteSlice) RemoveItem(item []byte) *ByteSlice {
 	return c
 }
 
-// InsertItem inserts item into the collection at position idx. Will panic if
-// idx is out of bounds.
-func (c *ByteSlice) InsertItem(item []byte, idx int) *ByteSlice {
+// InsertItem inserts item into the collection at position pos. Will panic if
+// pos is out of bounds.
+func (c *ByteSlice) InsertItem(item []byte, pos int) *ByteSlice {
 	var zeroValue []byte
 	c.items = append(c.items, zeroValue)
-	copy(c.items[idx+1:], c.items[idx:])
-	c.items[idx] = item
+	copy(c.items[pos+1:], c.items[pos:])
+	c.items[pos] = item
 	return c
 }
 

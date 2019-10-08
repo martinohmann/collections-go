@@ -87,16 +87,16 @@ func (c *Int64) LastN(n int) []int64 {
 	return c.Slice(c.Len()-n, c.Len())
 }
 
-// Get returns the item at idx from the collection. Will panic if the
-// underlying slice is shorter than idx+1.
-func (c *Int64) Get(idx int) int64 {
-	return c.Nth(idx)
+// Get returns the item at pos from the collection. Will panic if the
+// underlying slice is shorter than pos+1.
+func (c *Int64) Get(pos int) int64 {
+	return c.Nth(pos)
 }
 
 // Nth returns the nth item from the collection. Will panic if the underlying
-// slice is shorter than idx+1.
-func (c *Int64) Nth(idx int) int64 {
-	return c.items[idx]
+// slice is shorter than pos+1.
+func (c *Int64) Nth(pos int) int64 {
+	return c.items[pos]
 }
 
 // Len returns the length of the underlying int64 slice.
@@ -292,10 +292,10 @@ func (c *Int64) Reverse() *Int64 {
 	return c
 }
 
-// Remove removes the collection item at position idx. Will panic if idx is out
+// Remove removes the collection item at position pos. Will panic if pos is out
 // of bounds.
-func (c *Int64) Remove(idx int) *Int64 {
-	c.items = append(c.items[:idx], c.items[idx+1:]...)
+func (c *Int64) Remove(pos int) *Int64 {
+	c.items = append(c.items[:pos], c.items[pos+1:]...)
 	return c
 }
 
@@ -310,13 +310,13 @@ func (c *Int64) RemoveItem(item int64) *Int64 {
 	return c
 }
 
-// InsertItem inserts item into the collection at position idx. Will panic if
-// idx is out of bounds.
-func (c *Int64) InsertItem(item int64, idx int) *Int64 {
+// InsertItem inserts item into the collection at position pos. Will panic if
+// pos is out of bounds.
+func (c *Int64) InsertItem(item int64, pos int) *Int64 {
 	var zeroValue int64
 	c.items = append(c.items, zeroValue)
-	copy(c.items[idx+1:], c.items[idx:])
-	c.items[idx] = item
+	copy(c.items[pos+1:], c.items[pos:])
+	c.items[pos] = item
 	return c
 }
 

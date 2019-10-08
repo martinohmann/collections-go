@@ -87,16 +87,16 @@ func (c *Collection) LastN(n int) []*Type {
 	return c.Slice(c.Len()-n, c.Len())
 }
 
-// Get returns the item at idx from the collection. Will panic if the
-// underlying slice is shorter than idx+1.
-func (c *Collection) Get(idx int) *Type {
-	return c.Nth(idx)
+// Get returns the item at pos from the collection. Will panic if the
+// underlying slice is shorter than pos+1.
+func (c *Collection) Get(pos int) *Type {
+	return c.Nth(pos)
 }
 
 // Nth returns the nth item from the collection. Will panic if the underlying
-// slice is shorter than idx+1.
-func (c *Collection) Nth(idx int) *Type {
-	return c.items[idx]
+// slice is shorter than pos+1.
+func (c *Collection) Nth(pos int) *Type {
+	return c.items[pos]
 }
 
 // Len returns the length of the underlying *Type slice.
@@ -292,10 +292,10 @@ func (c *Collection) Reverse() *Collection {
 	return c
 }
 
-// Remove removes the collection item at position idx. Will panic if idx is out
+// Remove removes the collection item at position pos. Will panic if pos is out
 // of bounds.
-func (c *Collection) Remove(idx int) *Collection {
-	c.items = append(c.items[:idx], c.items[idx+1:]...)
+func (c *Collection) Remove(pos int) *Collection {
+	c.items = append(c.items[:pos], c.items[pos+1:]...)
 	return c
 }
 
@@ -310,13 +310,13 @@ func (c *Collection) RemoveItem(item *Type) *Collection {
 	return c
 }
 
-// InsertItem inserts item into the collection at position idx. Will panic if
-// idx is out of bounds.
-func (c *Collection) InsertItem(item *Type, idx int) *Collection {
+// InsertItem inserts item into the collection at position pos. Will panic if
+// pos is out of bounds.
+func (c *Collection) InsertItem(item *Type, pos int) *Collection {
 	var zeroValue *Type
 	c.items = append(c.items, zeroValue)
-	copy(c.items[idx+1:], c.items[idx:])
-	c.items[idx] = item
+	copy(c.items[pos+1:], c.items[pos:])
+	c.items[pos] = item
 	return c
 }
 

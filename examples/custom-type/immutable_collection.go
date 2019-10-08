@@ -87,16 +87,16 @@ func (c *ImmutableCollection) LastN(n int) []*Type {
 	return c.Slice(c.Len()-n, c.Len())
 }
 
-// Get returns the item at idx from the collection. Will panic if the
-// underlying slice is shorter than idx+1.
-func (c *ImmutableCollection) Get(idx int) *Type {
-	return c.Nth(idx)
+// Get returns the item at pos from the collection. Will panic if the
+// underlying slice is shorter than pos+1.
+func (c *ImmutableCollection) Get(pos int) *Type {
+	return c.Nth(pos)
 }
 
 // Nth returns the nth item from the collection. Will panic if the underlying
-// slice is shorter than idx+1.
-func (c *ImmutableCollection) Nth(idx int) *Type {
-	return c.items[idx]
+// slice is shorter than pos+1.
+func (c *ImmutableCollection) Nth(pos int) *Type {
+	return c.items[pos]
 }
 
 // Len returns the length of the underlying *Type slice.
@@ -305,12 +305,12 @@ func (c *ImmutableCollection) Reverse() *ImmutableCollection {
 	return d
 }
 
-// Remove removes the collection item at position idx. Will panic if idx is out
+// Remove removes the collection item at position pos. Will panic if pos is out
 // of bounds.
 // The result is a new collection, the original is not modified.
-func (c *ImmutableCollection) Remove(idx int) *ImmutableCollection {
+func (c *ImmutableCollection) Remove(pos int) *ImmutableCollection {
 	d := c.Copy()
-	d.items = append(d.items[:idx], d.items[idx+1:]...)
+	d.items = append(d.items[:pos], d.items[pos+1:]...)
 	return d
 }
 
@@ -328,15 +328,15 @@ func (c *ImmutableCollection) RemoveItem(item *Type) *ImmutableCollection {
 	return d
 }
 
-// InsertItem inserts item into the collection at position idx. Will panic if
-// idx is out of bounds.
+// InsertItem inserts item into the collection at position pos. Will panic if
+// pos is out of bounds.
 // The result is a new collection, the original is not modified.
-func (c *ImmutableCollection) InsertItem(item *Type, idx int) *ImmutableCollection {
+func (c *ImmutableCollection) InsertItem(item *Type, pos int) *ImmutableCollection {
 	var zeroValue *Type
 	d := c.Copy()
 	d.items = append(d.items, zeroValue)
-	copy(d.items[idx+1:], d.items[idx:])
-	d.items[idx] = item
+	copy(d.items[pos+1:], d.items[pos:])
+	d.items[pos] = item
 	return d
 }
 

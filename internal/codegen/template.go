@@ -102,16 +102,16 @@ func (c *{{.Name}}) LastN(n int) []{{.ItemType}} {
 	return c.Slice(c.Len()-n, c.Len())
 }
 
-// Get returns the item at idx from the collection. Will panic if the
-// underlying slice is shorter than idx+1.
-func (c *{{.Name}}) Get(idx int) {{.ItemType}} {
-	return c.Nth(idx)
+// Get returns the item at pos from the collection. Will panic if the
+// underlying slice is shorter than pos+1.
+func (c *{{.Name}}) Get(pos int) {{.ItemType}} {
+	return c.Nth(pos)
 }
 
 // Nth returns the nth item from the collection. Will panic if the underlying
-// slice is shorter than idx+1.
-func (c *{{.Name}}) Nth(idx int) {{.ItemType}} {
-	return c.items[idx]
+// slice is shorter than pos+1.
+func (c *{{.Name}}) Nth(pos int) {{.ItemType}} {
+	return c.items[pos]
 }
 
 // Len returns the length of the underlying {{.ItemType}} slice.
@@ -393,18 +393,18 @@ func (c *{{.Name}}) Reverse() *{{.Name}} {
 {{ end -}}
 }
 
-// Remove removes the collection item at position idx. Will panic if idx is out
+// Remove removes the collection item at position pos. Will panic if pos is out
 // of bounds.
 {{- if .Immutable }}
 // The result is a new collection, the original is not modified.
 {{- end }}
-func (c *{{.Name}}) Remove(idx int) *{{.Name}} {
+func (c *{{.Name}}) Remove(pos int) *{{.Name}} {
 {{ if .Immutable -}}
 	d := c.Copy()
-	d.items = append(d.items[:idx], d.items[idx+1:]...)
+	d.items = append(d.items[:pos], d.items[pos+1:]...)
 	return d
 {{ else -}}
-	c.items = append(c.items[:idx], c.items[idx+1:]...)
+	c.items = append(c.items[:pos], c.items[pos+1:]...)
 	return c
 {{ end -}}
 }
@@ -435,23 +435,23 @@ func (c *{{.Name}}) RemoveItem(item {{.ItemType}}) *{{.Name}} {
 {{ end -}}
 }
 
-// InsertItem inserts item into the collection at position idx. Will panic if
-// idx is out of bounds.
+// InsertItem inserts item into the collection at position pos. Will panic if
+// pos is out of bounds.
 {{- if .Immutable }}
 // The result is a new collection, the original is not modified.
 {{- end }}
-func (c *{{.Name}}) InsertItem(item {{.ItemType}}, idx int) *{{.Name}} {
+func (c *{{.Name}}) InsertItem(item {{.ItemType}}, pos int) *{{.Name}} {
     var zeroValue {{.ItemType}}
 {{ if .Immutable -}}
 	d := c.Copy()
 	d.items = append(d.items, zeroValue)
-	copy(d.items[idx+1:], d.items[idx:])
-	d.items[idx] = item
+	copy(d.items[pos+1:], d.items[pos:])
+	d.items[pos] = item
 	return d
 {{ else -}}
 	c.items = append(c.items, zeroValue)
-	copy(c.items[idx+1:], c.items[idx:])
-	c.items[idx] = item
+	copy(c.items[pos+1:], c.items[pos:])
+	c.items[pos] = item
 	return c
 {{ end -}}
 }

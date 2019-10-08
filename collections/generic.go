@@ -13,8 +13,8 @@ import (
 // use of reflection to access the underlying slice which is very slow.
 type Generic struct {
 	sliceType reflect.Type
-	zeroValue interface{}
-	rval      reflect.Value
+	zeroValue reflect.Value
+	items     reflect.Value
 }
 
 // New creates a new generalized immutable collection from items. Will
@@ -47,43 +47,43 @@ func SafeNew(items interface{}) (*Generic, error) {
 	}
 }
 
-func newGeneric(t reflect.Type, rval reflect.Value) *Generic {
+func newGeneric(t reflect.Type, items reflect.Value) *Generic {
 	return &Generic{
-		rval:      rval,
+		items:     items,
 		sliceType: t,
-		zeroValue: reflect.Zero(t.Elem()).Interface(),
+		zeroValue: reflect.Zero(t.Elem()),
 	}
 }
 
 func (c *Generic) makeSlice() reflect.Value {
-	return reflect.MakeSlice(c.sliceType, 0, c.rval.Len())
+	return reflect.MakeSlice(c.sliceType, 0, c.items.Len())
 }
 
 func (c *Generic) copySlice() reflect.Value {
-	s := reflect.MakeSlice(c.sliceType, c.rval.Len(), c.rval.Len())
-	reflect.Copy(s, c.rval)
+	s := reflect.MakeSlice(c.sliceType, c.items.Len(), c.items.Len())
+	reflect.Copy(s, c.items)
 	return s
 }
 
-func (c *Generic) valueAt(idx int) interface{} {
-	return c.rval.Index(idx).Interface()
+func (c *Generic) valueAt(pos int) interface{} {
+	return c.items.Index(pos).Interface()
 }
 
 // Interface returns the underlying slice used by the collection as interface{}
 // value.
 func (c *Generic) Interface() interface{} {
-	return c.rval.Interface()
+	return c.items.Interface()
 }
 
 // Items returns the underlying slice used by the collection.
 func (c *Generic) Items() interface{} {
-	return c.rval.Interface()
+	return c.items.Interface()
 }
 
 // EachIndex calls fn for every item in the collection. The slice index of the
 // item is passed to fn as the second argument.
 func (c *Generic) EachIndex(fn func(interface{}, int)) {
-	for i := 0; i < c.rval.Len(); i++ {
+	for i := 0; i < c.items.Len(); i++ {
 		fn(c.valueAt(i), i)
 	}
 }
@@ -98,7 +98,7 @@ func (c *Generic) Each(fn func(interface{})) {
 // IndexOf searches for el in the collection and returns the first index where
 // el is found. If el is not present in the collection IndexOf will return -1.
 func (c *Generic) IndexOf(el interface{}) int {
-	for i := 0; i < c.rval.Len(); i++ {
+	for i := 0; i < c.items.Len(); i++ {
 		if reflect.DeepEqual(c.valueAt(i), el) {
 			return i
 		}
@@ -139,33 +139,33 @@ func (c *Generic) LastN(n int) interface{} {
 	return c.Slice(c.Len()-n, c.Len())
 }
 
-// Get returns the item at idx from the collection. Will panic if the
-// underlying slice is shorter than idx+1.
-func (c *Generic) Get(idx int) interface{} {
-	return c.Nth(idx)
+// Get returns the item at pos from the collection. Will panic if the
+// underlying slice is shorter than pos+1.
+func (c *Generic) Get(pos int) interface{} {
+	return c.Nth(pos)
 }
 
 // Nth returns the nth item from the collection. Will panic if the underlying
-// slice is shorter than idx+1.
-func (c *Generic) Nth(idx int) interface{} {
-	return c.valueAt(idx)
+// slice is shorter than pos+1.
+func (c *Generic) Nth(pos int) interface{} {
+	return c.valueAt(pos)
 }
 
 // Len returns the length of the underlying slice.
 func (c *Generic) Len() int {
-	return c.rval.Len()
+	return c.items.Len()
 }
 
 // Cap returns the capacity of the underlying slice.
 func (c *Generic) Cap() int {
-	return c.rval.Cap()
+	return c.items.Cap()
 }
 
 // Append appends items and returns the collection. Will panic if items are not
 // of the slices element type.
 func (c *Generic) Append(items ...interface{}) *Generic {
 	for _, item := range items {
-		c.rval = reflect.Append(c.rval, reflect.ValueOf(item))
+		c.items = reflect.Append(c.items, reflect.ValueOf(item))
 	}
 
 	return c
@@ -177,17 +177,17 @@ func (c *Generic) Prepend(items ...interface{}) *Generic {
 	s := c.copySlice()
 
 	for i := 0; i < len(items); i++ {
-		c.rval = reflect.Append(c.rval, reflect.ValueOf(c.zeroValue))
+		c.items = reflect.Append(c.items, c.zeroValue)
 	}
 
 	n := 0
 	for _, item := range items {
-		c.rval.Index(n).Set(reflect.ValueOf(item))
+		c.items.Index(n).Set(reflect.ValueOf(item))
 		n++
 	}
 
 	for i := 0; i < s.Len(); i++ {
-		c.rval.Index(n + i).Set(s.Index(i))
+		c.items.Index(n + i).Set(s.Index(i))
 	}
 
 	return c
@@ -203,16 +203,16 @@ func (c *Generic) Copy() *Generic {
 // collection.
 func (c *Generic) Filter(fn func(interface{}) bool) *Generic {
 	n := 0
-	for i := 0; i < c.rval.Len(); i++ {
-		v := c.rval.Index(i)
+	for i := 0; i < c.items.Len(); i++ {
+		v := c.items.Index(i)
 
 		if fn(v.Interface()) {
-			c.rval.Index(n).Set(v)
+			c.items.Index(n).Set(v)
 			n++
 		}
 	}
 
-	c.rval = c.rval.Slice(0, n)
+	c.items = c.items.Slice(0, n)
 
 	return c
 }
@@ -237,8 +237,8 @@ func (c *Generic) Reject(fn func(interface{}) bool) *Generic {
 func (c *Generic) Partition(fn func(interface{}) bool) (*Generic, *Generic) {
 	lhs, rhs := c.makeSlice(), c.makeSlice()
 
-	for i := 0; i < c.rval.Len(); i++ {
-		v := c.rval.Index(i)
+	for i := 0; i < c.items.Len(); i++ {
+		v := c.items.Index(i)
 
 		if fn(v.Interface()) {
 			lhs = reflect.Append(lhs, v)
@@ -255,7 +255,7 @@ func (c *Generic) Partition(fn func(interface{}) bool) (*Generic, *Generic) {
 // returned by fn is not of the slices element type.
 func (c *Generic) Map(fn func(interface{}) interface{}) *Generic {
 	for i := 0; i < c.Len(); i++ {
-		c.rval.Index(i).Set(reflect.ValueOf(fn(c.valueAt(i))))
+		c.items.Index(i).Set(reflect.ValueOf(fn(c.valueAt(i))))
 	}
 
 	return c
@@ -267,7 +267,7 @@ func (c *Generic) Map(fn func(interface{}) interface{}) *Generic {
 // invocation. Will panic if the value returned by fn is not of the slices
 // element type.
 func (c *Generic) Reduce(fn func(reducer interface{}, item interface{}) interface{}) interface{} {
-	reducer := c.zeroValue
+	reducer := c.zeroValue.Interface()
 
 	for i := 0; i < c.Len(); i++ {
 		reducer = fn(reducer, c.valueAt(i))
@@ -291,7 +291,7 @@ func (c *Generic) Find(fn func(interface{}) bool) interface{} {
 // value of the slice's element type. The second return value denotes whether
 // the condition matched any item or not.
 func (c *Generic) FindOk(fn func(interface{}) bool) (interface{}, bool) {
-	for i := 0; i < c.rval.Len(); i++ {
+	for i := 0; i < c.items.Len(); i++ {
 		item := c.valueAt(i)
 
 		if fn(item) {
@@ -299,12 +299,12 @@ func (c *Generic) FindOk(fn func(interface{}) bool) (interface{}, bool) {
 		}
 	}
 
-	return c.zeroValue, false
+	return c.zeroValue.Interface(), false
 }
 
 // Any returns true as soon as fn evaluates to true for one item in c.
 func (c *Generic) Any(fn func(interface{}) bool) bool {
-	for i := 0; i < c.rval.Len(); i++ {
+	for i := 0; i < c.items.Len(); i++ {
 		if fn(c.valueAt(i)) {
 			return true
 		}
@@ -315,7 +315,7 @@ func (c *Generic) Any(fn func(interface{}) bool) bool {
 
 // All returns true if fn evaluates to true for all items in c.
 func (c *Generic) All(fn func(interface{}) bool) bool {
-	for i := 0; i < c.rval.Len(); i++ {
+	for i := 0; i < c.items.Len(); i++ {
 		if !fn(c.valueAt(i)) {
 			return false
 		}
@@ -326,7 +326,7 @@ func (c *Generic) All(fn func(interface{}) bool) bool {
 
 // Contains returns true if the collection contains el.
 func (c *Generic) Contains(el interface{}) bool {
-	for i := 0; i < c.rval.Len(); i++ {
+	for i := 0; i < c.items.Len(); i++ {
 		if reflect.DeepEqual(c.valueAt(i), el) {
 			return true
 		}
@@ -337,14 +337,14 @@ func (c *Generic) Contains(el interface{}) bool {
 
 // Sort sorts the collection using the passed in comparator func.
 func (c *Generic) Sort(fn func(interface{}, interface{}) bool) *Generic {
-	sort.Slice(c.rval.Interface(), c.lessFunc(fn))
+	sort.Slice(c.items.Interface(), c.lessFunc(fn))
 	return c
 }
 
 // IsSorted returns true if the collection is sorted in the order defined by
 // the passed in comparator func.
 func (c *Generic) IsSorted(fn func(interface{}, interface{}) bool) bool {
-	return sort.SliceIsSorted(c.rval.Interface(), c.lessFunc(fn))
+	return sort.SliceIsSorted(c.items.Interface(), c.lessFunc(fn))
 }
 
 func (c *Generic) lessFunc(fn func(interface{}, interface{}) bool) func(int, int) bool {
@@ -357,18 +357,18 @@ func (c *Generic) lessFunc(fn func(interface{}, interface{}) bool) func(int, int
 // reversed.
 func (c *Generic) Reverse() *Generic {
 	for l, r := 0, c.Len()-1; l < r; l, r = l+1, r-1 {
-		v := c.rval.Index(l).Interface()
-		c.rval.Index(l).Set(c.rval.Index(r))
-		c.rval.Index(r).Set(reflect.ValueOf(v))
+		v := c.items.Index(l).Interface()
+		c.items.Index(l).Set(c.items.Index(r))
+		c.items.Index(r).Set(reflect.ValueOf(v))
 	}
 
 	return c
 }
 
-// Remove removes the collection item at position idx. Will panic if idx is out
+// Remove removes the collection item at position pos. Will panic if pos is out
 // of bounds.
-func (c *Generic) Remove(idx int) *Generic {
-	c.rval = reflect.AppendSlice(c.rval.Slice(0, idx), c.rval.Slice(idx+1, c.rval.Len()))
+func (c *Generic) Remove(pos int) *Generic {
+	c.items = reflect.AppendSlice(c.items.Slice(0, pos), c.items.Slice(pos+1, c.items.Len()))
 	return c
 }
 
@@ -376,19 +376,19 @@ func (c *Generic) Remove(idx int) *Generic {
 func (c *Generic) RemoveItem(item interface{}) *Generic {
 	for i := 0; i < c.Len(); i++ {
 		if reflect.DeepEqual(c.valueAt(i), item) {
-			c.rval = reflect.AppendSlice(c.rval.Slice(0, i), c.rval.Slice(i+1, c.rval.Len()))
+			c.items = reflect.AppendSlice(c.items.Slice(0, i), c.items.Slice(i+1, c.items.Len()))
 		}
 	}
 
 	return c
 }
 
-// InsertItem inserts item into the collection at position idx. Will panic if
-// idx is out of bounds or if item is not of the slices element type.
-func (c *Generic) InsertItem(item interface{}, idx int) *Generic {
-	c.rval = reflect.Append(c.rval, reflect.ValueOf(c.zeroValue))
-	reflect.Copy(c.rval.Slice(idx+1, c.rval.Len()), c.rval.Slice(idx, c.rval.Len()-1))
-	c.rval.Index(idx).Set(reflect.ValueOf(item))
+// InsertItem inserts item into the collection at position pos. Will panic if
+// pos is out of bounds or if item is not of the slices element type.
+func (c *Generic) InsertItem(item interface{}, pos int) *Generic {
+	c.items = reflect.Append(c.items, c.zeroValue)
+	reflect.Copy(c.items.Slice(pos+1, c.items.Len()), c.items.Slice(pos, c.items.Len()-1))
+	c.items.Index(pos).Set(reflect.ValueOf(item))
 	return c
 }
 
@@ -397,13 +397,13 @@ func (c *Generic) InsertItem(item interface{}, idx int) *Generic {
 // underlying slice.
 func (c *Generic) Cut(i, j int) interface{} {
 	s := c.makeSlice()
-	s = reflect.AppendSlice(s, c.rval.Slice(0, i))
-	s = reflect.AppendSlice(s, c.rval.Slice(j, c.rval.Len()))
+	s = reflect.AppendSlice(s, c.items.Slice(0, i))
+	s = reflect.AppendSlice(s, c.items.Slice(j, c.items.Len()))
 	return s.Interface()
 }
 
 // Slice returns the items between slice index i and j. Will
 // panic if i or j is out of bounds.
 func (c *Generic) Slice(i, j int) interface{} {
-	return c.rval.Slice(i, j).Interface()
+	return c.items.Slice(i, j).Interface()
 }

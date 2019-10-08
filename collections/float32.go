@@ -87,16 +87,16 @@ func (c *Float32) LastN(n int) []float32 {
 	return c.Slice(c.Len()-n, c.Len())
 }
 
-// Get returns the item at idx from the collection. Will panic if the
-// underlying slice is shorter than idx+1.
-func (c *Float32) Get(idx int) float32 {
-	return c.Nth(idx)
+// Get returns the item at pos from the collection. Will panic if the
+// underlying slice is shorter than pos+1.
+func (c *Float32) Get(pos int) float32 {
+	return c.Nth(pos)
 }
 
 // Nth returns the nth item from the collection. Will panic if the underlying
-// slice is shorter than idx+1.
-func (c *Float32) Nth(idx int) float32 {
-	return c.items[idx]
+// slice is shorter than pos+1.
+func (c *Float32) Nth(pos int) float32 {
+	return c.items[pos]
 }
 
 // Len returns the length of the underlying float32 slice.
@@ -292,10 +292,10 @@ func (c *Float32) Reverse() *Float32 {
 	return c
 }
 
-// Remove removes the collection item at position idx. Will panic if idx is out
+// Remove removes the collection item at position pos. Will panic if pos is out
 // of bounds.
-func (c *Float32) Remove(idx int) *Float32 {
-	c.items = append(c.items[:idx], c.items[idx+1:]...)
+func (c *Float32) Remove(pos int) *Float32 {
+	c.items = append(c.items[:pos], c.items[pos+1:]...)
 	return c
 }
 
@@ -310,13 +310,13 @@ func (c *Float32) RemoveItem(item float32) *Float32 {
 	return c
 }
 
-// InsertItem inserts item into the collection at position idx. Will panic if
-// idx is out of bounds.
-func (c *Float32) InsertItem(item float32, idx int) *Float32 {
+// InsertItem inserts item into the collection at position pos. Will panic if
+// pos is out of bounds.
+func (c *Float32) InsertItem(item float32, pos int) *Float32 {
 	var zeroValue float32
 	c.items = append(c.items, zeroValue)
-	copy(c.items[idx+1:], c.items[idx:])
-	c.items[idx] = item
+	copy(c.items[pos+1:], c.items[pos:])
+	c.items[pos] = item
 	return c
 }
 

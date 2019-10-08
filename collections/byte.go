@@ -87,16 +87,16 @@ func (c *Byte) LastN(n int) []byte {
 	return c.Slice(c.Len()-n, c.Len())
 }
 
-// Get returns the item at idx from the collection. Will panic if the
-// underlying slice is shorter than idx+1.
-func (c *Byte) Get(idx int) byte {
-	return c.Nth(idx)
+// Get returns the item at pos from the collection. Will panic if the
+// underlying slice is shorter than pos+1.
+func (c *Byte) Get(pos int) byte {
+	return c.Nth(pos)
 }
 
 // Nth returns the nth item from the collection. Will panic if the underlying
-// slice is shorter than idx+1.
-func (c *Byte) Nth(idx int) byte {
-	return c.items[idx]
+// slice is shorter than pos+1.
+func (c *Byte) Nth(pos int) byte {
+	return c.items[pos]
 }
 
 // Len returns the length of the underlying byte slice.
@@ -292,10 +292,10 @@ func (c *Byte) Reverse() *Byte {
 	return c
 }
 
-// Remove removes the collection item at position idx. Will panic if idx is out
+// Remove removes the collection item at position pos. Will panic if pos is out
 // of bounds.
-func (c *Byte) Remove(idx int) *Byte {
-	c.items = append(c.items[:idx], c.items[idx+1:]...)
+func (c *Byte) Remove(pos int) *Byte {
+	c.items = append(c.items[:pos], c.items[pos+1:]...)
 	return c
 }
 
@@ -310,13 +310,13 @@ func (c *Byte) RemoveItem(item byte) *Byte {
 	return c
 }
 
-// InsertItem inserts item into the collection at position idx. Will panic if
-// idx is out of bounds.
-func (c *Byte) InsertItem(item byte, idx int) *Byte {
+// InsertItem inserts item into the collection at position pos. Will panic if
+// pos is out of bounds.
+func (c *Byte) InsertItem(item byte, pos int) *Byte {
 	var zeroValue byte
 	c.items = append(c.items, zeroValue)
-	copy(c.items[idx+1:], c.items[idx:])
-	c.items[idx] = item
+	copy(c.items[pos+1:], c.items[pos:])
+	c.items[pos] = item
 	return c
 }
 

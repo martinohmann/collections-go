@@ -87,16 +87,16 @@ func (c *ImmutableFloat64) LastN(n int) []float64 {
 	return c.Slice(c.Len()-n, c.Len())
 }
 
-// Get returns the item at idx from the collection. Will panic if the
-// underlying slice is shorter than idx+1.
-func (c *ImmutableFloat64) Get(idx int) float64 {
-	return c.Nth(idx)
+// Get returns the item at pos from the collection. Will panic if the
+// underlying slice is shorter than pos+1.
+func (c *ImmutableFloat64) Get(pos int) float64 {
+	return c.Nth(pos)
 }
 
 // Nth returns the nth item from the collection. Will panic if the underlying
-// slice is shorter than idx+1.
-func (c *ImmutableFloat64) Nth(idx int) float64 {
-	return c.items[idx]
+// slice is shorter than pos+1.
+func (c *ImmutableFloat64) Nth(pos int) float64 {
+	return c.items[pos]
 }
 
 // Len returns the length of the underlying float64 slice.
@@ -305,12 +305,12 @@ func (c *ImmutableFloat64) Reverse() *ImmutableFloat64 {
 	return d
 }
 
-// Remove removes the collection item at position idx. Will panic if idx is out
+// Remove removes the collection item at position pos. Will panic if pos is out
 // of bounds.
 // The result is a new collection, the original is not modified.
-func (c *ImmutableFloat64) Remove(idx int) *ImmutableFloat64 {
+func (c *ImmutableFloat64) Remove(pos int) *ImmutableFloat64 {
 	d := c.Copy()
-	d.items = append(d.items[:idx], d.items[idx+1:]...)
+	d.items = append(d.items[:pos], d.items[pos+1:]...)
 	return d
 }
 
@@ -328,15 +328,15 @@ func (c *ImmutableFloat64) RemoveItem(item float64) *ImmutableFloat64 {
 	return d
 }
 
-// InsertItem inserts item into the collection at position idx. Will panic if
-// idx is out of bounds.
+// InsertItem inserts item into the collection at position pos. Will panic if
+// pos is out of bounds.
 // The result is a new collection, the original is not modified.
-func (c *ImmutableFloat64) InsertItem(item float64, idx int) *ImmutableFloat64 {
+func (c *ImmutableFloat64) InsertItem(item float64, pos int) *ImmutableFloat64 {
 	var zeroValue float64
 	d := c.Copy()
 	d.items = append(d.items, zeroValue)
-	copy(d.items[idx+1:], d.items[idx:])
-	d.items[idx] = item
+	copy(d.items[pos+1:], d.items[pos:])
+	d.items[pos] = item
 	return d
 }
 
