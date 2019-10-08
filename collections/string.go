@@ -332,7 +332,7 @@ func (c *String) InsertItem(item string, pos int) *String {
 // between index i and j removed. Will panic if i or j is out of bounds of the
 // underlying slice.
 func (c *String) Cut(i, j int) []string {
-	s := make([]string, 0, c.Cap())
+	s := make([]string, 0, c.Len())
 	s = append(s, c.items[:i]...)
 	return append(s, c.items[j:]...)
 }

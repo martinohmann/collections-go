@@ -178,13 +178,13 @@ func (c *ImmutableGeneric) Append(items ...interface{}) *ImmutableGeneric {
 // will not be modified. Will panic if items are not of the slices element
 // type.
 func (c *ImmutableGeneric) Prepend(items ...interface{}) *ImmutableGeneric {
-	s := reflect.MakeSlice(c.sliceType, 0, c.items.Len()+len(items))
+	l := c.items.Len() + len(items)
+	s := reflect.MakeSlice(c.sliceType, l, l)
+	reflect.Copy(s.Slice(len(items), s.Len()), c.items)
 
-	for _, item := range items {
-		s = reflect.Append(s, reflect.ValueOf(item))
+	for i, item := range items {
+		s.Index(i).Set(reflect.ValueOf(item))
 	}
-
-	s = reflect.AppendSlice(s, c.items)
 
 	return newImmutableGeneric(c.sliceType, s)
 }
@@ -198,17 +198,21 @@ func (c *ImmutableGeneric) Copy() *ImmutableGeneric {
 // Filter collects all items for which fn evaluates to true into a new
 // collection. The original collection is not altered.
 func (c *ImmutableGeneric) Filter(fn func(interface{}) bool) *ImmutableGeneric {
-	s := c.makeSlice()
+	d := c.Copy()
 
-	for i := 0; i < c.items.Len(); i++ {
-		v := c.items.Index(i)
+	n := 0
+	for i := 0; i < d.items.Len(); i++ {
+		v := d.items.Index(i)
 
 		if fn(v.Interface()) {
-			s = reflect.Append(s, v)
+			d.items.Index(n).Set(v)
+			n++
 		}
 	}
 
-	return newImmutableGeneric(c.sliceType, s)
+	d.items = d.items.Slice(0, n)
+
+	return d
 }
 
 // Collect collects all items for which fn evaluates to true into a new
@@ -259,10 +263,10 @@ func (c *ImmutableGeneric) Map(fn func(interface{}) interface{}) *ImmutableGener
 // modified. Will panic if the value returned by fn is not of the slices
 // element type.
 func (c *ImmutableGeneric) MapIndex(fn func(interface{}, int) interface{}) *ImmutableGeneric {
-	s := c.makeSlice()
+	s := c.copySlice()
 
 	for i := 0; i < c.Len(); i++ {
-		s = reflect.Append(s, reflect.ValueOf(fn(c.valueAt(i), i)))
+		s.Index(i).Set(reflect.ValueOf(fn(s.Index(i).Interface(), i)))
 	}
 
 	return newImmutableGeneric(c.sliceType, s)
@@ -366,13 +370,15 @@ func (c *ImmutableGeneric) lessFunc(fn func(interface{}, interface{}) bool) func
 // Reverse copies the collection and returns it with the order of all items
 // reversed.
 func (c *ImmutableGeneric) Reverse() *ImmutableGeneric {
-	s := c.makeSlice()
+	d := c.Copy()
 
-	for i := c.items.Len() - 1; i >= 0; i-- {
-		s = reflect.Append(s, c.items.Index(i))
+	for l, r := 0, d.Len()-1; l < r; l, r = l+1, r-1 {
+		v := d.items.Index(l).Interface()
+		d.items.Index(l).Set(d.items.Index(r))
+		d.items.Index(r).Set(reflect.ValueOf(v))
 	}
 
-	return newImmutableGeneric(c.sliceType, s)
+	return d
 }
 
 // Remove removes the collection item at position pos. Will panic if pos is out
@@ -415,7 +421,8 @@ func (c *ImmutableGeneric) InsertItem(item interface{}, pos int) *ImmutableGener
 // underlying slice.
 func (c *ImmutableGeneric) Cut(i, j int) interface{} {
 	s := c.copySlice()
-	return reflect.AppendSlice(s.Slice(0, i), s.Slice(j, s.Len())).Interface()
+	s = reflect.AppendSlice(s.Slice(0, i), s.Slice(j, s.Len()))
+	return s.Interface()
 }
 
 // Slice returns the items between slice index i and j. Will

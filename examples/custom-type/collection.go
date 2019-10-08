@@ -332,7 +332,7 @@ func (c *Collection) InsertItem(item *Type, pos int) *Collection {
 // between index i and j removed. Will panic if i or j is out of bounds of the
 // underlying slice.
 func (c *Collection) Cut(i, j int) []*Type {
-	s := make([]*Type, 0, c.Cap())
+	s := make([]*Type, 0, c.Len())
 	s = append(s, c.items[:i]...)
 	return append(s, c.items[j:]...)
 }

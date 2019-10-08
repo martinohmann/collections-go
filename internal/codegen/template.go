@@ -473,7 +473,7 @@ func (c *{{.Name}}) Cut(i, j int) []{{.ItemType}} {
 	d := c.Copy()
 	return append(d.items[:i], d.items[j:]...)
 {{ else -}}
-	s := make([]{{.ItemType}}, 0, c.Cap())
+	s := make([]{{.ItemType}}, 0, c.Len())
 	s = append(s, c.items[:i]...)
 	return append(s, c.items[j:]...)
 {{ end -}}
