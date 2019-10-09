@@ -22,7 +22,7 @@ type Signature struct {
 }
 
 var MethodMap = map[string]Signature{
-	"All": Signature{
+	"All": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -49,7 +49,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Any": Signature{
+	"Any": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -76,7 +76,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Append": Signature{
+	"Append": {
 		Variadic: true,
 		In: []Parameter{
 			{
@@ -92,7 +92,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Cap": Signature{
+	"Cap": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -104,7 +104,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Collect": Signature{
+	"Collect": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -131,7 +131,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Contains": Signature{
+	"Contains": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -146,7 +146,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Copy": Signature{
+	"Copy": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -158,7 +158,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Cut": Signature{
+	"Cut": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -176,7 +176,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Each": Signature{
+	"Each": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -193,7 +193,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"EachIndex": Signature{
+	"EachIndex": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -213,7 +213,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Filter": Signature{
+	"Filter": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -240,7 +240,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Find": Signature{
+	"Find": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -267,7 +267,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"First": Signature{
+	"First": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -279,7 +279,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"FirstN": Signature{
+	"FirstN": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -294,7 +294,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Get": Signature{
+	"Get": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -309,7 +309,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"IndexOf": Signature{
+	"IndexOf": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -324,7 +324,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"InsertItem": Signature{
+	"InsertItem": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -342,7 +342,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"IsSorted": Signature{
+	"IsSorted": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -372,7 +372,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Items": Signature{
+	"Items": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -384,7 +384,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Last": Signature{
+	"Last": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -396,7 +396,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"LastN": Signature{
+	"LastN": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -411,7 +411,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Len": Signature{
+	"Len": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -423,7 +423,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Map": Signature{
+	"Map": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -450,7 +450,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"MapIndex": Signature{
+	"MapIndex": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -480,7 +480,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Nth": Signature{
+	"Nth": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -495,7 +495,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Partition": Signature{
+	"Partition": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -525,7 +525,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Prepend": Signature{
+	"Prepend": {
 		Variadic: true,
 		In: []Parameter{
 			{
@@ -541,7 +541,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Reduce": Signature{
+	"Reduce": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -571,7 +571,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Reject": Signature{
+	"Reject": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -598,7 +598,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Remove": Signature{
+	"Remove": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -613,7 +613,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"RemoveItem": Signature{
+	"RemoveItem": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -628,7 +628,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Reverse": Signature{
+	"Reverse": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -640,7 +640,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Slice": Signature{
+	"Slice": {
 		In: []Parameter{
 			{
 				CollectionType: true,
@@ -658,7 +658,7 @@ var MethodMap = map[string]Signature{
 			},
 		},
 	},
-	"Sort": Signature{
+	"Sort": {
 		In: []Parameter{
 			{
 				CollectionType: true,
