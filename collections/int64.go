@@ -332,7 +332,7 @@ func (c *Int64) InsertItem(item int64, pos int) *Int64 {
 // between index i and j removed. Will panic if i or j is out of bounds of the
 // underlying slice.
 func (c *Int64) Cut(i, j int) []int64 {
-	s := make([]int64, 0, c.Cap())
+	s := make([]int64, 0, c.Len())
 	s = append(s, c.items[:i]...)
 	return append(s, c.items[j:]...)
 }

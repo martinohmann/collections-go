@@ -332,7 +332,7 @@ func (c *Int32) InsertItem(item int32, pos int) *Int32 {
 // between index i and j removed. Will panic if i or j is out of bounds of the
 // underlying slice.
 func (c *Int32) Cut(i, j int) []int32 {
-	s := make([]int32, 0, c.Cap())
+	s := make([]int32, 0, c.Len())
 	s = append(s, c.items[:i]...)
 	return append(s, c.items[j:]...)
 }

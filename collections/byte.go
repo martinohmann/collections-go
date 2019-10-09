@@ -332,7 +332,7 @@ func (c *Byte) InsertItem(item byte, pos int) *Byte {
 // between index i and j removed. Will panic if i or j is out of bounds of the
 // underlying slice.
 func (c *Byte) Cut(i, j int) []byte {
-	s := make([]byte, 0, c.Cap())
+	s := make([]byte, 0, c.Len())
 	s = append(s, c.items[:i]...)
 	return append(s, c.items[j:]...)
 }

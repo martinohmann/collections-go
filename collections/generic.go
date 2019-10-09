@@ -173,21 +173,15 @@ func (c *Generic) Append(items ...interface{}) *Generic {
 // Prepend prepends items and returns the collection. Will panic if items are
 // not of the slices element type.
 func (c *Generic) Prepend(items ...interface{}) *Generic {
-	s := c.copySlice()
+	l := c.items.Len() + len(items)
+	s := reflect.MakeSlice(c.sliceType, l, l)
+	reflect.Copy(s.Slice(len(items), s.Len()), c.items)
 
-	for i := 0; i < len(items); i++ {
-		c.items = reflect.Append(c.items, c.zeroValue)
+	for i, item := range items {
+		s.Index(i).Set(reflect.ValueOf(item))
 	}
 
-	n := 0
-	for _, item := range items {
-		c.items.Index(n).Set(reflect.ValueOf(item))
-		n++
-	}
-
-	for i := 0; i < s.Len(); i++ {
-		c.items.Index(n + i).Set(s.Index(i))
-	}
+	c.items = s
 
 	return c
 }
@@ -365,9 +359,9 @@ func (c *Generic) lessFunc(fn func(interface{}, interface{}) bool) func(int, int
 // reversed.
 func (c *Generic) Reverse() *Generic {
 	for l, r := 0, c.Len()-1; l < r; l, r = l+1, r-1 {
-		v := c.items.Index(l).Interface()
-		c.items.Index(l).Set(c.items.Index(r))
-		c.items.Index(r).Set(reflect.ValueOf(v))
+		v := c.items.Index(r).Interface()
+		c.items.Index(r).Set(c.items.Index(l))
+		c.items.Index(l).Set(reflect.ValueOf(v))
 	}
 
 	return c
@@ -404,9 +398,8 @@ func (c *Generic) InsertItem(item interface{}, pos int) *Generic {
 // between index i and j removed. Will panic if i or j is out of bounds of the
 // underlying slice.
 func (c *Generic) Cut(i, j int) interface{} {
-	s := c.makeSlice()
-	s = reflect.AppendSlice(s, c.items.Slice(0, i))
-	s = reflect.AppendSlice(s, c.items.Slice(j, c.items.Len()))
+	s := c.copySlice()
+	s = reflect.AppendSlice(s.Slice(0, i), s.Slice(j, s.Len()))
 	return s.Interface()
 }
 

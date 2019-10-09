@@ -40,12 +40,12 @@ func NewCommand() *cobra.Command {
 func Run(config *codegen.Config) error {
 	buf, err := codegen.Generate(config)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, string(buf))
+		fmt.Fprintln(os.Stderr, string(buf))
 		return err
 	}
 
 	if config.OutputFile == "-" {
-		fmt.Fprintf(os.Stdout, string(buf))
+		fmt.Fprintln(os.Stdout, string(buf))
 		return nil
 	}
 
