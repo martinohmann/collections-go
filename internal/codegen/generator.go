@@ -12,9 +12,7 @@ import (
 type Parameters struct {
 	Package   string
 	Name      string
-	Exported  string
 	ItemType  string
-	ZeroValue string
 	Immutable bool
 	Imports   []Import
 }
