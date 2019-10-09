@@ -4,15 +4,38 @@ import (
 	"reflect"
 )
 
+// ParameterType defines the type of function parameter in the MethodMap.
+// Usually types are defined using reflection kinds, but for types that are
+// specific to each collection (e.g. the type of the collection itself, its
+// slice and element type) this is not possible.
+type ParameterType int
+
+const (
+	// ReflectionType denotes that a parameter should just be checked using its
+	// reflection kind.
+	ReflectionType ParameterType = iota
+
+	// CollectionType denotes that the parameter must match the type of the
+	// collection.
+	CollectionType
+
+	// SliceType denotes that the parameter must match the type of the
+	// collection's underlying slice.
+	SliceType
+
+	// ElementType denotes that the parameter must match the type of the
+	// collection's element type.
+	ElementType
+)
+
+// Parameter describes a function parameter.
 type Parameter struct {
-	Type           reflect.Type
-	Kind           reflect.Kind
-	FuncSignature  Signature
-	ElementType    bool
-	CollectionType bool
-	SliceType      bool
+	Type          ParameterType
+	Kind          reflect.Kind
+	FuncSignature Signature
 }
 
+// Signature describes the signature of a function.
 type Signature struct {
 	NumIn    int
 	NumOut   int
@@ -21,18 +44,20 @@ type Signature struct {
 	Variadic bool
 }
 
+// MethodMap contains the names of all expected collection methods together
+// with their function signature.
 var MethodMap = map[string]Signature{
 	"All": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Func,
 				FuncSignature: Signature{
 					In: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 					},
 					Out: []Parameter{
@@ -52,14 +77,14 @@ var MethodMap = map[string]Signature{
 	"Any": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Func,
 				FuncSignature: Signature{
 					In: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 					},
 					Out: []Parameter{
@@ -80,7 +105,7 @@ var MethodMap = map[string]Signature{
 		Variadic: true,
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Slice,
@@ -88,14 +113,14 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 	},
 	"Cap": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 		Out: []Parameter{
@@ -107,14 +132,14 @@ var MethodMap = map[string]Signature{
 	"Collect": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Func,
 				FuncSignature: Signature{
 					In: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 					},
 					Out: []Parameter{
@@ -127,17 +152,17 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 	},
 	"Contains": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
-				ElementType: true,
+				Type: ElementType,
 			},
 		},
 		Out: []Parameter{
@@ -149,19 +174,19 @@ var MethodMap = map[string]Signature{
 	"Copy": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 	},
 	"Cut": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Int,
@@ -172,21 +197,21 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				SliceType: true,
+				Type: SliceType,
 			},
 		},
 	},
 	"Each": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Func,
 				FuncSignature: Signature{
 					In: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 					},
 				},
@@ -196,14 +221,14 @@ var MethodMap = map[string]Signature{
 	"EachIndex": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Func,
 				FuncSignature: Signature{
 					In: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 						{
 							Kind: reflect.Int,
@@ -216,14 +241,14 @@ var MethodMap = map[string]Signature{
 	"Filter": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Func,
 				FuncSignature: Signature{
 					In: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 					},
 					Out: []Parameter{
@@ -236,21 +261,21 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 	},
 	"Find": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Func,
 				FuncSignature: Signature{
 					In: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 					},
 					Out: []Parameter{
@@ -263,26 +288,26 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				ElementType: true,
+				Type: ElementType,
 			},
 		},
 	},
 	"First": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 		Out: []Parameter{
 			{
-				ElementType: true,
+				Type: ElementType,
 			},
 		},
 	},
 	"FirstN": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Int,
@@ -290,14 +315,14 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				SliceType: true,
+				Type: SliceType,
 			},
 		},
 	},
 	"Get": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Int,
@@ -305,17 +330,17 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				ElementType: true,
+				Type: ElementType,
 			},
 		},
 	},
 	"IndexOf": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
-				ElementType: true,
+				Type: ElementType,
 			},
 		},
 		Out: []Parameter{
@@ -327,10 +352,10 @@ var MethodMap = map[string]Signature{
 	"InsertItem": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
-				ElementType: true,
+				Type: ElementType,
 			},
 			{
 				Kind: reflect.Int,
@@ -338,24 +363,24 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 	},
 	"IsSorted": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Func,
 				FuncSignature: Signature{
 					In: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 					},
 					Out: []Parameter{
@@ -375,31 +400,31 @@ var MethodMap = map[string]Signature{
 	"Items": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 		Out: []Parameter{
 			{
-				SliceType: true,
+				Type: SliceType,
 			},
 		},
 	},
 	"Last": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 		Out: []Parameter{
 			{
-				ElementType: true,
+				Type: ElementType,
 			},
 		},
 	},
 	"LastN": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Int,
@@ -407,14 +432,14 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				SliceType: true,
+				Type: SliceType,
 			},
 		},
 	},
 	"Len": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 		Out: []Parameter{
@@ -426,19 +451,19 @@ var MethodMap = map[string]Signature{
 	"Map": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Func,
 				FuncSignature: Signature{
 					In: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 					},
 					Out: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 					},
 				},
@@ -446,21 +471,21 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 	},
 	"MapIndex": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Func,
 				FuncSignature: Signature{
 					In: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 						{
 							Kind: reflect.Int,
@@ -468,7 +493,7 @@ var MethodMap = map[string]Signature{
 					},
 					Out: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 					},
 				},
@@ -476,14 +501,14 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 	},
 	"Nth": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Int,
@@ -491,21 +516,21 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				ElementType: true,
+				Type: ElementType,
 			},
 		},
 	},
 	"Partition": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Func,
 				FuncSignature: Signature{
 					In: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 					},
 					Out: []Parameter{
@@ -518,10 +543,10 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 	},
@@ -529,7 +554,7 @@ var MethodMap = map[string]Signature{
 		Variadic: true,
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Slice,
@@ -537,29 +562,29 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 	},
 	"Reduce": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Func,
 				FuncSignature: Signature{
 					In: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 					},
 					Out: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 					},
 				},
@@ -567,21 +592,21 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				ElementType: true,
+				Type: ElementType,
 			},
 		},
 	},
 	"Reject": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Func,
 				FuncSignature: Signature{
 					In: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 					},
 					Out: []Parameter{
@@ -594,14 +619,14 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 	},
 	"Remove": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Int,
@@ -609,41 +634,41 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 	},
 	"RemoveItem": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
-				ElementType: true,
+				Type: ElementType,
 			},
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 	},
 	"Reverse": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 	},
 	"Slice": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Int,
@@ -654,24 +679,24 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				SliceType: true,
+				Type: SliceType,
 			},
 		},
 	},
 	"Sort": {
 		In: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 			{
 				Kind: reflect.Func,
 				FuncSignature: Signature{
 					In: []Parameter{
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 						{
-							ElementType: true,
+							Type: ElementType,
 						},
 					},
 					Out: []Parameter{
@@ -684,7 +709,7 @@ var MethodMap = map[string]Signature{
 		},
 		Out: []Parameter{
 			{
-				CollectionType: true,
+				Type: CollectionType,
 			},
 		},
 	},

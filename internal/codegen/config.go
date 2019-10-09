@@ -12,6 +12,7 @@ import (
 
 var nonAlphaRegexp = regexp.MustCompile("[^a-zA-Z0-9_]+")
 
+// Config holds the config options for the collections-gen command.
 type Config struct {
 	Package      string
 	Name         string
@@ -22,12 +23,14 @@ type Config struct {
 	OutputFile   string
 }
 
+// NewDefaultConfig creates the default *Config.
 func NewDefaultConfig() *Config {
 	return &Config{
 		Package: os.Getenv("GOPACKAGE"),
 	}
 }
 
+// AddFlags adds the command line flags for collections-gen to cmd.
 func (c *Config) AddFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&c.Package, "package", "p", c.Package, "The package of the generated file")
 	cmd.Flags().StringVarP(&c.Name, "name", "n", c.Name, "The name of the collection type")
@@ -37,6 +40,7 @@ func (c *Config) AddFlags(cmd *cobra.Command) {
 	cmd.Flags().StringSliceVarP(&c.Imports, "imports", "I", c.Imports, "Additional imports to add to the generated code. Use this to import types or the equals func from a different package. Format: [alias=]fullPkgPath")
 }
 
+// Validate validates the config.
 func (c *Config) Validate() error {
 	if len(c.Package) == 0 {
 		return errors.New("package must not be empty")
@@ -53,19 +57,23 @@ func (c *Config) Validate() error {
 	return nil
 }
 
+// Complete completes the config. This should be called after the config is
+// validated.
 func (c *Config) Complete(args []string) error {
 	c.OutputFile = args[0]
 
-	c.ensureEqualityFunc()
+	if c.EqualityFunc == "" && c.requiresEqualityFunc() {
+		c.ensureEqualityFunc()
+	}
+
+	if c.Name == "" {
+		c.Name = generateCollectionName(c.ItemType)
+	}
 
 	return nil
 }
 
 func (c *Config) ensureEqualityFunc() {
-	if c.EqualityFunc != "" || (!strings.HasPrefix(c.ItemType, "[]") && !strings.HasPrefix(c.ItemType, "map[")) {
-		return
-	}
-
 	// This will be slow but it is good enough as default and users can
 	// override this explicitly if required.
 	c.EqualityFunc = "reflect.DeepEqual"
@@ -77,12 +85,15 @@ func (c *Config) ensureEqualityFunc() {
 	c.Imports = append(c.Imports, "reflect")
 }
 
-func (c *Config) getCollectionName() string {
-	if c.Name != "" {
-		return c.Name
-	}
+// requiresEqualityFunc performs a very basic check for item types that are
+// slices or maps as these are not comparable using "==".
+func (c *Config) requiresEqualityFunc() bool {
+	return strings.HasPrefix(c.ItemType, "[]") ||
+		strings.HasPrefix(c.ItemType, "map[")
+}
 
-	itemType := nonAlphaRegexp.ReplaceAllString(c.ItemType, "")
+func generateCollectionName(itemType string) string {
+	sanitized := nonAlphaRegexp.ReplaceAllString(itemType, "")
 
-	return fmt.Sprintf("%sCollection", strings.Title(itemType))
+	return fmt.Sprintf("%sCollection", strings.Title(sanitized))
 }

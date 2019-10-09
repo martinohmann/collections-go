@@ -13,6 +13,9 @@ type collectionTypes struct {
 	elem  reflect.Type
 }
 
+// ValidateCollection takes a collection object and a slice of the collection's
+// storage type and validates its method signatures. Will return an error if
+// methods are missing or their signature does not match the expectations.
 func ValidateCollection(obj, slice interface{}) error {
 	objType := reflect.TypeOf(obj)
 	sliceType := reflect.TypeOf(slice)
@@ -59,12 +62,12 @@ func getElemType(sliceType reflect.Type) reflect.Type {
 }
 
 func getExpectedType(param Parameter, types collectionTypes) reflect.Type {
-	switch {
-	case param.ElementType:
+	switch param.Type {
+	case ElementType:
 		return types.elem
-	case param.SliceType:
+	case SliceType:
 		return types.slice
-	case param.CollectionType:
+	case CollectionType:
 		return types.obj
 	}
 
