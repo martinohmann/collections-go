@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// NewCommand creates the collections-gen command.
 func NewCommand() *cobra.Command {
 	config := codegen.NewDefaultConfig()
 
@@ -37,8 +38,9 @@ func NewCommand() *cobra.Command {
 	return cmd
 }
 
+// Run runs the code generator with given configuration.
 func Run(config *codegen.Config) error {
-	buf, err := codegen.Generate(config)
+	buf, err := codegen.Generate(config, codegen.Template)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, string(buf))
 		return err
