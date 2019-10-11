@@ -1,27 +1,23 @@
 package collections
 
 import (
-	"math/rand"
 	"strings"
 	"testing"
+
+	"github.com/martinohmann/collections-go/internal/testutil"
 )
 
-var alphabet = "abcdefghijklmnopqrstuvwxyz"
+func BenchmarkStringFilter1(b *testing.B)   { benchmarkStringFilter(b, 1) }
+func BenchmarkStringFilter2(b *testing.B)   { benchmarkStringFilter(b, 2) }
+func BenchmarkStringFilter10(b *testing.B)  { benchmarkStringFilter(b, 10) }
+func BenchmarkStringFilter100(b *testing.B) { benchmarkStringFilter(b, 100) }
 
-func BenchmarkStringFilter10_5(b *testing.B) {
-	benchmarkStringFilter(b, 10, 5)
-}
-
-func BenchmarkStringFilter1000_20(b *testing.B) {
-	benchmarkStringFilter(b, 1000, 20)
-}
-
-func benchmarkStringFilter(b *testing.B, n, strlen int) {
+func benchmarkStringFilter(b *testing.B, n int) {
 	fn := func(item string) bool {
 		return !strings.HasPrefix(item, "a")
 	}
 
-	input := randomStringSlice(5, 10)
+	input := testutil.RandStringSlice(n, 10)
 
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -31,20 +27,17 @@ func benchmarkStringFilter(b *testing.B, n, strlen int) {
 	}
 }
 
-func BenchmarkStringPartition10_5(b *testing.B) {
-	benchmarkStringPartition(b, 10, 5)
-}
+func BenchmarkStringPartition1(b *testing.B)   { benchmarkStringPartition(b, 1) }
+func BenchmarkStringPartition2(b *testing.B)   { benchmarkStringPartition(b, 2) }
+func BenchmarkStringPartition10(b *testing.B)  { benchmarkStringPartition(b, 10) }
+func BenchmarkStringPartition100(b *testing.B) { benchmarkStringPartition(b, 100) }
 
-func BenchmarkStringPartition1000_20(b *testing.B) {
-	benchmarkStringPartition(b, 1000, 20)
-}
-
-func benchmarkStringPartition(b *testing.B, n, strlen int) {
+func benchmarkStringPartition(b *testing.B, n int) {
 	fn := func(item string) bool {
 		return strings.HasPrefix(item, "a")
 	}
 
-	input := randomStringSlice(5, 10)
+	input := testutil.RandStringSlice(n, 10)
 
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -65,8 +58,13 @@ func BenchmarkStringInsertItem(b *testing.B) {
 	}
 }
 
-func BenchmarkStringReverse(b *testing.B) {
-	input := randomStringSlice(100, 10)
+func BenchmarkStringReverse1(b *testing.B)   { benchmarkStringReverse(b, 1) }
+func BenchmarkStringReverse2(b *testing.B)   { benchmarkStringReverse(b, 2) }
+func BenchmarkStringReverse10(b *testing.B)  { benchmarkStringReverse(b, 10) }
+func BenchmarkStringReverse100(b *testing.B) { benchmarkStringReverse(b, 100) }
+
+func benchmarkStringReverse(b *testing.B, n int) {
+	input := testutil.RandStringSlice(n, 10)
 
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -77,7 +75,7 @@ func BenchmarkStringReverse(b *testing.B) {
 }
 
 func BenchmarkStringCopy(b *testing.B) {
-	input := randomStringSlice(100, 10)
+	input := testutil.RandStringSlice(100, 10)
 
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -88,7 +86,7 @@ func BenchmarkStringCopy(b *testing.B) {
 }
 
 func BenchmarkStringCut(b *testing.B) {
-	input := randomStringSlice(100, 10)
+	input := testutil.RandStringSlice(100, 10)
 
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -98,8 +96,13 @@ func BenchmarkStringCut(b *testing.B) {
 	}
 }
 
-func BenchmarkStringMap(b *testing.B) {
-	input := randomStringSlice(100, 10)
+func BenchmarkStringMap1(b *testing.B)   { benchmarkStringMap(b, 1) }
+func BenchmarkStringMap2(b *testing.B)   { benchmarkStringMap(b, 2) }
+func BenchmarkStringMap10(b *testing.B)  { benchmarkStringMap(b, 10) }
+func BenchmarkStringMap100(b *testing.B) { benchmarkStringMap(b, 100) }
+
+func benchmarkStringMap(b *testing.B, n int) {
+	input := testutil.RandStringSlice(n, 10)
 
 	fn := func(item string) string {
 		return item
@@ -122,20 +125,4 @@ func BenchmarkStringPrepend(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		NewString(input).Prepend("a")
 	}
-}
-
-func randomStringSlice(n, strlen int) []string {
-	s := make([]string, n)
-	rand.Int63n(int64(len(alphabet) - 1))
-
-	for i := 0; i < n; i++ {
-		r := make([]byte, strlen)
-		for j := 0; j < strlen; j++ {
-			r[j] = alphabet[rand.Int63n(int64(len(alphabet)-1))]
-		}
-
-		s[i] = string(r)
-	}
-
-	return s
 }

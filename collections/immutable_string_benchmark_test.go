@@ -3,22 +3,21 @@ package collections
 import (
 	"strings"
 	"testing"
+
+	"github.com/martinohmann/collections-go/internal/testutil"
 )
 
-func BenchmarkImmutableStringFilter10_5(b *testing.B) {
-	benchmarkImmutableStringFilter(b, 10, 5)
-}
+func BenchmarkImmutableStringFilter1(b *testing.B)   { benchmarkImmutableStringFilter(b, 1) }
+func BenchmarkImmutableStringFilter2(b *testing.B)   { benchmarkImmutableStringFilter(b, 2) }
+func BenchmarkImmutableStringFilter10(b *testing.B)  { benchmarkImmutableStringFilter(b, 10) }
+func BenchmarkImmutableStringFilter100(b *testing.B) { benchmarkImmutableStringFilter(b, 100) }
 
-func BenchmarkImmutableStringFilter1000_20(b *testing.B) {
-	benchmarkImmutableStringFilter(b, 1000, 20)
-}
-
-func benchmarkImmutableStringFilter(b *testing.B, n, strlen int) {
+func benchmarkImmutableStringFilter(b *testing.B, n int) {
 	fn := func(item string) bool {
 		return !strings.HasPrefix(item, "a")
 	}
 
-	input := randomStringSlice(5, 10)
+	input := testutil.RandStringSlice(n, 10)
 
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -28,20 +27,17 @@ func benchmarkImmutableStringFilter(b *testing.B, n, strlen int) {
 	}
 }
 
-func BenchmarkImmutableStringPartition10_5(b *testing.B) {
-	benchmarkImmutableStringPartition(b, 10, 5)
-}
+func BenchmarkImmutableStringPartition1(b *testing.B)   { benchmarkImmutableStringPartition(b, 1) }
+func BenchmarkImmutableStringPartition2(b *testing.B)   { benchmarkImmutableStringPartition(b, 2) }
+func BenchmarkImmutableStringPartition10(b *testing.B)  { benchmarkImmutableStringPartition(b, 10) }
+func BenchmarkImmutableStringPartition100(b *testing.B) { benchmarkImmutableStringPartition(b, 100) }
 
-func BenchmarkImmutableStringPartition1000_20(b *testing.B) {
-	benchmarkImmutableStringPartition(b, 1000, 20)
-}
-
-func benchmarkImmutableStringPartition(b *testing.B, n, strlen int) {
+func benchmarkImmutableStringPartition(b *testing.B, n int) {
 	fn := func(item string) bool {
 		return strings.HasPrefix(item, "a")
 	}
 
-	input := randomStringSlice(5, 10)
+	input := testutil.RandStringSlice(n, 10)
 
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -62,8 +58,13 @@ func BenchmarkImmutableStringInsertItem(b *testing.B) {
 	}
 }
 
-func BenchmarkImmutableStringReverse(b *testing.B) {
-	input := randomStringSlice(100, 10)
+func BenchmarkImmutableStringReverse1(b *testing.B)   { benchmarkImmutableStringReverse(b, 1) }
+func BenchmarkImmutableStringReverse2(b *testing.B)   { benchmarkImmutableStringReverse(b, 2) }
+func BenchmarkImmutableStringReverse10(b *testing.B)  { benchmarkImmutableStringReverse(b, 10) }
+func BenchmarkImmutableStringReverse100(b *testing.B) { benchmarkImmutableStringReverse(b, 100) }
+
+func benchmarkImmutableStringReverse(b *testing.B, n int) {
+	input := testutil.RandStringSlice(n, 10)
 
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -74,7 +75,7 @@ func BenchmarkImmutableStringReverse(b *testing.B) {
 }
 
 func BenchmarkImmutableStringCut(b *testing.B) {
-	input := randomStringSlice(100, 10)
+	input := testutil.RandStringSlice(100, 10)
 
 	b.ReportAllocs()
 	b.ResetTimer()
@@ -84,8 +85,13 @@ func BenchmarkImmutableStringCut(b *testing.B) {
 	}
 }
 
-func BenchmarkImmutableStringMap(b *testing.B) {
-	input := randomStringSlice(100, 10)
+func BenchmarkImmutableStringMap1(b *testing.B)   { benchmarkImmutableStringMap(b, 1) }
+func BenchmarkImmutableStringMap2(b *testing.B)   { benchmarkImmutableStringMap(b, 2) }
+func BenchmarkImmutableStringMap10(b *testing.B)  { benchmarkImmutableStringMap(b, 10) }
+func BenchmarkImmutableStringMap100(b *testing.B) { benchmarkImmutableStringMap(b, 100) }
+
+func benchmarkImmutableStringMap(b *testing.B, n int) {
+	input := testutil.RandStringSlice(n, 10)
 
 	fn := func(item string) string {
 		return item

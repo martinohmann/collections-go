@@ -370,15 +370,12 @@ func (c *ImmutableGeneric) lessFunc(fn func(interface{}, interface{}) bool) func
 // Reverse copies the collection and returns it with the order of all items
 // reversed.
 func (c *ImmutableGeneric) Reverse() *ImmutableGeneric {
-	d := c.Copy()
-
-	for l, r := 0, d.Len()-1; l < r; l, r = l+1, r-1 {
-		v := d.items.Index(l).Interface()
-		d.items.Index(l).Set(d.items.Index(r))
-		d.items.Index(r).Set(reflect.ValueOf(v))
+	s := reflect.MakeSlice(c.sliceType, c.Len(), c.Len())
+	for l, r := 0, c.Len()-1; l < c.Len(); l, r = l+1, r-1 {
+		s.Index(l).Set(c.items.Index(r))
 	}
 
-	return d
+	return newImmutableGeneric(c.sliceType, s)
 }
 
 // Remove removes the collection item at position pos. Will panic if pos is out
