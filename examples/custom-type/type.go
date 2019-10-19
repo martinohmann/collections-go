@@ -1,7 +1,10 @@
 package customtype
 
-//go:generate collections-gen -t *Type -n Collection -e Equal collection.go
-//go:generate collections-gen -t *Type -n ImmutableCollection -e Equal -i immutable_collection.go
+//go:generate collection-gen -i github.com/martinohmann/collections-go/examples/custom-type -p github.com/martinohmann/collections-go/examples/custom-type
+
+// +collection-gen=true
+// +collection-gen:options=pointer,equality-func=Equal
+// +collection-gen:options=pointer,immutable,equality-func=Equal
 
 // Type is just a dummy type for demonstrating a custom type example.
 type Type struct {
