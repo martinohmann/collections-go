@@ -7,7 +7,7 @@ collections-go
 
 Code generator for generating mutable and immutable collection types.
 
-Use `collections-gen` to generate collection types for your custom slices or
+Use `collection-gen` to generate collection types for your custom slices or
 use one of the collection types bundled with this repository. collections-go
 provides ready to use collections for builtin types like `int`, `string`,
 `[]byte` and generic collections that use the `reflect` package under the hood
@@ -16,7 +16,7 @@ for arbitrary types.
 Installation
 ------------
 
-To install `collections-gen` run:
+To install the `collection-gen` code generator run:
 
 ```
 git clone git@github.com:martinohmann/collections-go.git
