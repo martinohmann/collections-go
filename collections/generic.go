@@ -358,11 +358,12 @@ func (c *Generic) lessFunc(fn func(interface{}, interface{}) bool) func(int, int
 // Reverse copies the collection and returns it with the order of all items
 // reversed.
 func (c *Generic) Reverse() *Generic {
-	for l, r := 0, c.Len()-1; l < r; l, r = l+1, r-1 {
-		v := c.items.Index(r).Interface()
-		c.items.Index(r).Set(c.items.Index(l))
-		c.items.Index(l).Set(reflect.ValueOf(v))
+	s := reflect.MakeSlice(c.sliceType, c.Len(), c.Len())
+	for l, r := 0, c.Len()-1; l < c.Len(); l, r = l+1, r-1 {
+		s.Index(l).Set(c.items.Index(r))
 	}
+
+	c.items = s
 
 	return c
 }
