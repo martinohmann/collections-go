@@ -116,7 +116,7 @@ func (s Signature) String() string {
 	}
 
 	out := s.Out.String()
-	if strings.Index(out, " ") != -1 {
+	if strings.Contains(out, " ") {
 		out = "(" + out + ")"
 	}
 
