@@ -11,7 +11,7 @@ const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890
 var source = rand.NewSource(time.Now().UnixNano())
 
 // RandStringSlice returns a slice which contains n random strings of length l.
-// The strings a generated using RandString.
+// The strings are generated using RandString.
 func RandStringSlice(n, l int) []string {
 	s := make([]string, n)
 
