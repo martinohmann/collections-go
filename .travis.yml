@@ -12,6 +12,7 @@ cache:
     - $HOME/.cache/go-build
     - $HOME/gopath/pkg/mod
 script:
+  - make verify-codegen
   - make coverage
   - make lint
   - 'if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then make bench; fi'
