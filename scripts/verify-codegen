@@ -1,0 +1,22 @@
+#!/bin/bash
+
+set -e
+
+output="$(git status --porcelain)"
+
+if [ -n "$output" ]; then
+  echo "cannot verify codegen, working dir not clean:"
+  echo "$output"
+  exit 1
+fi
+
+make generate
+
+output="$(git status --porcelain)"
+
+if [ -n "$output" ]; then
+  echo "codegen produced changes:"
+  echo "$output"
+  git --no-pager diff
+  exit 1
+fi
